@@ -1,0 +1,3295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Concept-map-flow-builder by muddy-28</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Concept-map-flow-builder</h1>
+        <h2>This article documents the development of a small exploratory project for flowchart visualization and editing that is built upon SVG and AngularJS. It makes good use of the MVVM pattern so that UI logic can be unit-tested</h2>
+        <a href="https://github.com/muddy-28/concept-map-flow-builder" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h2>
+<a id="overview" class="anchor" href="#overview" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Overview">Overview</a>
+</h2>
+
+<p>This article documents the development of a small exploratory
+project for flowchart visualization and editing that is built upon <a href="http://en.wikipedia.org/wiki/Svg">SVG</a> and <a href="http://en.wikipedia.org/wiki/AngularJS">AngularJS</a>. It makes good use of the <a href="http://en.wikipedia.org/wiki/MVVM">MVVM</a> pattern so that UI logic can be <a href="http://en.wikipedia.org/wiki/Unit_testing">unit-tested</a>.</p>
+
+<p>After so many articles on <a href="http://www.codeproject.com/Articles/ashley_davis#articles">WPF</a>
+it may come as a surprise that I now have an article on web UI. For the
+last couple of years I have been ramping up my web development skills.</p>
+
+<p>Professionally I have been using web UI in some pretty interesting
+ways connected to game development. For example building game dev tools
+and in-game web UIs, but I'm not talking about that today. </p>
+
+<p>It seemed only natural that I should take my <a href="http://www.codeproject.com/Articles/182683/NetworkView-A-WPF-custom-control-for-visualizing-a">NetworkView WPF article</a>
+and bring it over to web UI. I've always been interested in
+visualization and editing of networks, graphs and flow-charts and it is
+one of the ways that I put my skills to the test in any particular area.</p>
+
+<p>During development of the code I have certainly moved my skills forward in many areas, including <a href="http://en.wikipedia.org/wiki/Javascript">Javascript</a>, <a href="http://en.wikipedia.org/wiki/Test-driven_development">TDD</a>,
+SVG and AngularJS. Specifically I have learned how to apply the
+goodness of the MVVM pattern to web UI development. In this article I
+will show how I have deployed the MVVM concepts in HTML5 and Javascript.</p><p>A
+little over a year ago I started developing using TDD, something I
+always wanted to do when working with WPF, but never got around to it
+(or really appreciated the power of it). TDD has really helped me to
+realize the full potential of MVVM. </p>
+
+
+
+
+
+<p>My first attempt at NetworkView, in WPF, took a long time.
+Over two years (in my spare-time of course!) I wrote a series of 5
+articles that were all building up to NetworkView. A lot of effort went
+into achieving those articles! This time around the development and
+writing of the article has been much quicker - only a few months
+(stealing 30 minutes here and there from my busy
+life).  I attribute the faster development time to the following
+reasons:</p>
+
+<ul>
+<li>I set my sights much lower. The new code isn't as general purpose or as feature rich as the original NetworkView.</li>
+<li>I already knew how to build this kind of thing so I was able to start at a running pace.</li>
+<li>I have loads of experience with the MVVM pattern so I didn't have
+to spend much time thinking it through! This can't be understated, boy
+was it hard coming to grips with WPF general purpose controls and the
+MVVM pattern the first time around!</li>
+<li>Working with web UI and Javascript (it pains me to say this) is so
+much easier and less complex than working with WPF (although I still
+love C#, I sincerely wish they'd overhaul WPF).</li>
+<li>Finally, using TDD allowed me to quickly and easily overcome many
+of the traditional difficulties with Javascript development.
+Importantly I was able to refactor aggressively without having to deal
+with the usual defects that arise from behavior changes.</li>
+</ul>
+
+<p>So let's re-live my exploration of SVG + AngularJS flowcharts.</p>
+
+
+
+<h3>
+<a id="screenshot" class="anchor" href="#screenshot" aria-hidden="true"><span class="octicon octicon-link"></span></a>Screenshot</h3>
+
+
+
+
+<p>This is an annotated screenshot of the flowchart web app. On the
+left is an editable JSON representation of the flowchart's
+data-model. On the right is the graphical representation of the
+flowchart's view-model. Editing either side (left as text, right
+visually) updates the other, they automatically stay in sync.</p>
+
+<p><img alt="Adnan Shafique" src="http://www.codeproject.com/KB/scripting/709340/Screenshot.png"></p>
+
+
+
+
+
+<h3>
+<a id="audience" class="anchor" href="#audience" aria-hidden="true"><span class="octicon octicon-link"></span></a>Audience</h3>
+<p>So who should read this article?</p>
+
+<p>If you are interested in developing graphical web applications using
+SVG and AngularJS, this article should help.</p>
+
+
+
+<p>You should already know a bit of HTML5/Javascript or be willing
+to learn quickly as we go. A basic knowledge of SVG and AngularJS will
+help, although I'll
+expect you are learning some of that right now and I'll do my best to
+help you get on track with it. I'll expect you already know something
+about MVVM, I have talked about it extensively in previous articles, if
+not then don't worry I'll give an overview of what it is
+and why it is useful.</p>
+
+<p>I will also mention TDD as well to help you understand how it might help you as a developer.</p>
+
+
+
+<h3>
+<a id="what-and-why" class="anchor" href="#what-and-why" aria-hidden="true"><span class="octicon octicon-link"></span></a>What and Why?</h3>
+<p>This article is about a web UI redevelopment of my original <a href="http://www.codeproject.com/Articles/182683/NetworkView-A-WPF-custom-control-for-visualizing-a">NetworkView WPF control</a>.
+As mentioned the new code isn't as feature rich or general
+purpose as the original WPF control. Developing something that
+was completely functional wasn't the intention, I really was just looking for a way to
+exercise my skills in Javascript, TDD, AngularJS and SVG and consolidate my web development skills. </p>
+
+<p>I really enjoy working with web UI. Since I was first looking at web
+technologies in the early days of my career to now I have seen many
+changes in the tech landscape. Web technologies have progressed a
+remarkably long way and the community is alive and brimming with
+enthusiasm. </p>
+
+
+
+<p>My NetworkView article was popular and a rebuild in web
+UI seemed like a good idea. I was building
+something I already knew about so I could achieve it much quicker
+than if I had started something new. However there are many parts of the original article that don't have a
+counterpart in the new code. There is no zooming and panning, there is
+no equivalent to adorners to provide feedback. There is no templating
+for different types of nodes.</p>
+
+<p>In summary, this code will be useful to you if:</p>
+
+<ul>
+<li>You want to learn about the technologies I am talking about in this article.</li>
+<li>If you need a flowchart and want to adapt my code to your needs.</li>
+<li>You want to learn how to deploy AngularJS in a situation that is non-trivial and a little bit outside its normal use-case.</li>
+</ul>
+
+<p>Whatever your reason for reading this article, you have some work
+ahead of you either in understanding or modifying my code. If you are trying to make progress with
+AngularJS + SVG or even just web UI graphics in general, then I'm sure this will help.</p>
+
+
+
+
+<h3>
+<a id="live-demo" class="anchor" href="#live-demo" aria-hidden="true"><span class="octicon octicon-link"></span></a>Live Demo</h3>
+<p>First up let's look at the live demo. This allows you to
+see what you are getting without having to get the code locally and run
+your own web server (which isn't difficult anyway).</p>
+
+<p>Here is the main demo:</p>
+
+<p><a href="https://dl.dropboxusercontent.com/u/16408368/WebUI_FlowChart/index.html">https://dl.dropboxusercontent.com/u/16408368/WebUI_FlowChart/index.html</a></p>
+
+<p>Here are the unit-tests:</p>
+
+<p><a href="https://dl.dropboxusercontent.com/u/16408368/WebUI_FlowChart/jasmine/SpecRunner.html">https://dl.dropboxusercontent.com/u/16408368/WebUI_FlowChart/jasmine/SpecRunner.html</a></p>
+
+
+<h3>
+<a id="running-the-code" class="anchor" href="#running-the-code" aria-hidden="true"><span class="octicon octicon-link"></span></a>Running the code</h3>
+<p>Everything you need to run the code locally is attached to this article as a zip file.  However I recommend going to 
+    <a href="https://github.com/ashleydavis/AngularJS-FlowChart">the github repository</a> for the most up-to-date code. I recommend using <a href="http://www.sourcetreeapp.com/">SourceTree</a> as an interface to Git.</p>
+
+<p>Running the sample app requires that you run it through a local web
+server and view it through your browser. You could just disable your
+browser's web security and load the app in your browser directly from
+the file system using <em>file://</em>. However I can't recommend that
+as you would have to override the security in your web browser, besides
+it is easier than ever to run a local web server. Let me show you how.</p>
+
+<p>I have provided a simple bare bones web server (that <a href="http://stackoverflow.com/questions/6084360/node-js-as-a-simple-web-server">I found on StackOverflow</a>) that is built on <a href="http://nodejs.org/">NodeJS</a>. When you have NodeJS installed open a cli and change directory to where the code is.  Run the following command:</p>
+
+<pre>node server.js</pre>
+
+<p>You now have a local web server. Point your web browser at the following URL to see the web app:</p>
+
+<p><a href="http://localhost:8888/">http://localhost:8888/</a></p>
+
+<p>And to run the unit-tests:</p>
+
+<p><a href="http://localhost:8888/jasmine/SpecRunner.html">http://localhost:8888/jasmine/SpecRunner.html</a></p>
+
+<p></p><p>Update: I found an even easier way to run a web server. Install  <a href="https://github.com/nodeapps/http-server">http-server</a> using the following command: </p><pre>npm install http-server -g</pre><p>Navigate to the directory with the code and run the web-server:</p><pre>http-server</pre><h3>
+<a id="javascript" class="anchor" href="#javascript" aria-hidden="true"><span class="octicon octicon-link"></span></a>Javascript</h3>
+<p>Javascript is the language of the internet and recently I have
+developed an appreciation for it. Sure, it has some bad
+parts, but if you follow <a href="http://www.amazon.com/JavaScript-Good-Parts-Douglas-Crockford/dp/0596517742">Crockford's advice</a> you can stick to the good parts.</p>
+
+<p>First-class functions are an important feature and very powerful.
+I'm really glad we (kind of) have these in C# now. Even the
+latest C++ standard supports lambdas, it seems that <a href="http://en.wikipedia.org/wiki/Functional_programming">function programming</a> is creeping in everywhere these days. Coming at Javascript from a classical language you may find that <a href="http://en.wikipedia.org/wiki/Prototype-based_programming">prototypal inheritance</a> is rather unusual, but it is more powerful, even if difficult to understand.</p>
+
+<p>Once you are setup and used to it, it's hard
+to beat the Javascript workflow. Install Google Chrome, install a good
+text editor, you now have a development environment! Including
+profiling and debugging. Combine this with <a href="https://npmjs.org/package/node-live-reload">node-livereload</a> 
+and a <a href="http://en.wikipedia.org/wiki/Test_suite">suite of unit-tests</a> 
+and you have a system where your web application and unit-tests will re-run automatically <em>as you type your code</em>.  
+I can't emphasize enough how important this is for productivity. 
+Extremely fast <a href="http://www.infoq.com/news/2011/03/agile-feedback-loops">feedback cycles</a> are so important 
+for effective Agile development.</p>
+
+
+<h3>
+<a id="test-driven-development" class="anchor" href="#test-driven-development" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test-driven development</h3>
+<p><a href="http://www.amazon.com/Test-Driven-Development-By-Example/dp/0321146530/ref=sr_1_1?ie=UTF8&amp;qid=1386021460&amp;sr=8-1&amp;keywords=test+driven+development">Test-driven development</a>
+has been one of the most positive changes in my career so far. It was
+always hard to keep design simple and minimize defects in code
+that is rapidly evolving. As the code grows large it becomes harder to
+manage, harder to keep under control and difficult to refactor. This
+problem is only worse when using a language like
+Javascript.</p>
+
+
+
+<p>Unit-testing is hard. It takes effort and discipline. You can't
+afford to leave it until after you have developed the code - it is too easy to be lazy and just skip the
+tests when things seem to be working. TDD turns this around. You have to be disciplined, you have to slow
+down, you are forced to write your unit-tests (otherwise you just
+aren't doing TDD). You have to think up front about your coding, there
+is no way around it. Thinking before coding is always a good thing and generally all to rare. </p>
+
+
+
+<p>TDD makes you design your code for testability. This sometimes means
+slightly over-engineered code, but TDD means you can safely refactor on
+the go, this keeps the design simple and under control. The trick
+to refactoring is to make the design look perfect for the evolved
+requirements, even though the code has changed drastically above and beyond
+the original design. When I say slightly over-engineered that's exactly what I mean, only
+slightly. I have seen and participated in massively over-engineered
+coding. TDD for the most part has a negative effect on
+over-engineering. TDD means you only code what you are
+testing. This ensures your code is always needed, always to the point.
+Your efforts are focused on the end requirements and you don't end up
+coding something you don't need (unless your testing for something you
+don't need, and why would you do that?). This attitude of <em>code only what you need </em>solves
+one of the most insidious problems that developers have ever faced: it
+helps to prevent development of code that will never be used. <em>Eliminate waste</em> is principle number 1 in <a href="http://en.wikipedia.org/wiki/Lean_software_development">lean software development</a>.</p>
+
+<p>Creating a permanent scaffolding of unit-tests for your program prevents <a href="http://en.wikipedia.org/wiki/Code_rot">code rot</a> and enables <a href="http://en.wikipedia.org/wiki/Refactoring">refactoring</a>. Another thing it is good for: preserving your sanity and increasing your confidence in the code.</p>
+
+<p>Now granted that this web application is smallish and not overly
+complicated, however professionally I have used TDD on much more
+complex
+programs. This web application was built in my spare time, only
+spending 30-60 minutes at a time on it. Occasionally I took a week or
+two off to concentrate on other things. Switching projects takes
+significant mental effort, but TDD makes it much easier to switch back.
+When you come back to the project you run the tests and then pick a
+simple
+next test to
+implement. There is no better way of getting back into it again from a
+cold start. </p>
+
+<p>TDD has helped me keep the code-base in check as it changed, adding
+feature after feature, heading towards my end goal. Along the way
+I refactored aggressively without adding defects. This is important. So
+often I have experienced refactoring go horribly wrong, I'm talking
+about the kind of event that causes defects for weeks if not months.
+One of TDD's most attractive benefits is a reduction in the pain
+associated with constant code evolution.</p>
+
+<p>I once heard someone say TDD is like training wheels for
+programmers. I laughed at the time, but after some thought I decided
+this comment, though funny, was far from the truth. I have worked on a
+TDD team for a year now and I can honestly say that TDD is
+significantly harder than the usual <em>fire from the hip </em>programming. It takes effort to learn and makes you slower (what I would call the <em>true cost of </em>development).
+TDD is very powerful and it isn't right for every project (it has
+little value in prototype or exploratory projects), but the payoff for
+longer term projects is potentially enormous if you are willing to make
+the investment.</p>
+
+<p>Last word. Having the unit-tests was essential for making the app
+work across browsers. I didn't have to do cross-browser testing
+during development. Near the end it was mostly enough to get the
+unit-tests working under each browser.</p>
+
+<h3>
+<a id="mvvm" class="anchor" href="#mvvm" aria-hidden="true"><span class="octicon octicon-link"></span></a>MVVM</h3>
+
+
+<p>Four years ago when I was first learning <a href="http://en.wikipedia.org/wiki/Windows_Presentation_Foundation">WPF</a>
+I never would have imagined how far down the rabbit hole I was going to
+end up. Initially the learning curve was steep, but after two years and
+multiple articles I had a good understanding of WPF and <a href="http://en.wikipedia.org/wiki/MVVM">MVVM</a>.</p><p>MVVM is a <a href="http://en.wikipedia.org/wiki/Design_pattern">pattern</a> evolved from <a href="http://en.wikipedia.org/wiki/Model_view_controller">MVC</a>
+and it isn't actually that difficult to understand, although I think
+something about the combination of MVVM and WPF and the resulting
+complexities gives people (including myself) a lot of trouble in the
+beginning.</p>
+
+<p>The basic concept of MVVM is pretty simple: <em>Separate your UI logic from your UI rendering so that you can unit-test your UI logic</em>. That's essentially it! It answers the question: <em>how do I unit-test my GUI?</em></p>
+
+
+
+<p>Fitting MVVM into Javascript looks a bit different, but is similar
+and simpler than MVVM under WPF. Javascript/HTML may not
+be the ideal way to build an application, but it is more
+productive than working with C#/WPF. I hope to
+show that MVVM + web UI gives you the benefits of MVVM, minus the
+complexity of WPF (although you may not appreciate this unless you have
+worked with WPF).</p>
+
+
+
+
+<h3>
+<a id="angularjs" class="anchor" href="#angularjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>AngularJS</h3>
+<p>I am very pleased to have discovered <a href="http://en.wikipedia.org/wiki/AngularJS">AngularJS</a> right at the point where I was moving into web UI.  </p>
+
+<p>What is AngularJS? <br>Probably best to learn that <a href="http://docs.angularjs.org/guide/introduction">direct from the source</a>.</p>
+
+<p>Why use AngularJS? <br>Well in this article I'm mostly interested in its <a href="http://en.wikipedia.org/wiki/Data_binding">data-binding</a> capabilities.  AngularJS provides the magic necessary to glue your HTML view to your <a href="http://en.wikipedia.org/wiki/View_model">view-model</a> and its data-bindings are trivial to use.</p>
+
+<p>Why else would you use AngularJS? <br>Google <a href="https://www.google.com.au/search?q=reasons+to+use+AngularJS"><em>reasons to use AngularJS</em></a> or <a href="https://www.google.com.au/search?q=benefits+of+AngularJS"><em>benefits of AngularJS</em></a> and you will find many.</p>
+
+<p>How does AngularJS fit in with MVVM? I'm glad you asked. It looks like this:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/MVVM-AngularJS.png"></p>
+
+<p>The <em>controller</em> sets up a <em>scope</em>. The scope contains variables that are data-bound to the <em>HTML view</em>. In the flowchart application the scope contains a reference to the <em>flowchart's</em> <a href="http://en.wikipedia.org/wiki/View_model">view-model</a>, which in-turn wraps up the <em>flowchart's</em> <a href="http://en.wikipedia.org/wiki/Data_model">data-model</a>.</p>
+
+
+
+<p>Hang on, there is a controller? <br>Doesn't
+that mean it is MVC rather than
+MVVM? Well to be sure AngularJS is a bit different to what we know of
+as MVVM. The AngularJS pattern is also different to traditional MVC.
+This happens all the time: new patterns are created, old patterns are
+evolved or built-on, that's part of progress in software development.
+It comes down to professional developers making their own patterns as
+they need them and they do it all the time mostly without even thinking
+much about it. In some cases they are based on established patterns
+like
+MVC, other times they are completely unique to the problem at
+hand. So it's no mystery that these two patterns are different
+even though they are similar on a deeper level. In the same way that
+Microsoft gave birth to the MVVM pattern through WPF, Google have
+created their own <em>MVC-like</em> pattern through AngularJS. </p>
+
+<p>In the end it is just terminology and semantics and I consider the AngularJS controller to simply be a part of the
+view-model. The way I see it, the application is comprised of a data-model, a
+view-model and the view. Ultimately it really depends on how you think
+about things, I come from a MVVM/WPF background so I see my work in
+light of that, you will no doubt see it differently.</p>
+
+<p>AngularJS has been pleasantly simple to use with and I have
+encountered very few issues.
+Since I have been using it there has been multiple releases that have
+actually fixed problems that I was having. I have even delved into the
+source code from time to time to gain a better understanding. Although
+not trival the code is certainly very readable and understandable.</p>
+
+<p>I'll talk more about <a href="#Problems_with_AngularJS">AngularJS issues</a> and solutions at the end of the article.</p>
+
+<p>Want more info about AngularJS? <br>They have <a href="http://docs.angularjs.org/guide/">awesome documentation</a>.</p>
+
+<h3>
+<a id="svg" class="anchor" href="#svg" aria-hidden="true"><span class="octicon octicon-link"></span></a>SVG</h3>
+<p>I have only paid attention to <a href="http://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a>
+in recent years, but it is impressive that it has
+actually been around for a long time (since 1999 according to wikipedia). </p>
+
+
+
+<p>After working with XAML I was amused to discover how many
+features that Microsoft lifted straight out of SVG. That's how things
+work, we wouldn't get anywhere in particular if we weren't
+innovating on top of previous discoveries and inventions.</p><p>I suspect that SVG was somewhat forgotten and
+is now experiencing something of a renaissance. These days, SVG has <a href="http://caniuse.com/svg">good browser support</a>
+although there are still issues to be aware of and some features to
+stay clear of. To a certain extent you can embed SVG directly in HTML and
+treat it as though it were just HTML! Unfortunately you get bitten by
+bad library support (I'm looking at you <a href="http://en.wikipedia.org/wiki/Jquery">jQuery</a>)
+but I'm pleased to say that AngularJS have made progress with their SVG
+support whilst I have been developing the flowchart web application. </p>
+
+<p>I'll talk about the <a href="#Problems_with_SVG">SVG issues</a> at the end of the article.</p>
+
+<h3>
+<a id="development-environment" class="anchor" href="#development-environment" aria-hidden="true"><span class="octicon octicon-link"></span></a>Development Environment</h3>
+<p>This is a quick outline of my development environment.</p>
+
+<p>Core tools:</p>
+<ul>
+<li><a href="http://www.brackets.io">BRACKETS</a></li>
+<li>Google Chrome (with Firefox and IE for testing)</li>
+<li>
+<a href="https://npmjs.org/package/node-live-reload">node-livereload</a> for automatically refreshing the browser when the code/html changes
+    (the GUI <a href="http://livereload.com/">LiveReload</a>, although potentially awesome, is buggy as hell under Windows and barely works).</li>
+<li>
+<a href="http://www.sourcetreeapp.com/">SourceTree</a> for interacting with <a href="https://github.com/">github</a>
+</li>
+<li>
+<a href="https://workflowy.com/">Workflowy</a> for managing my todo lists</li>
+<li>Internet Explorer and Firefox for testing</li>
+</ul>
+
+<p>Core libraries:</p>
+<ul>
+<li><a href="http://jquery.com/">JQuery</a></li>
+<li><a href="http://angularjs.org/">AngularJS</a></li>
+<li>
+<a href="http://pivotal.github.io/jasmine/">Jasmine</a> for testing</li>
+</ul>
+
+<p>Other tools:</p>
+<ul>
+<li>
+<a href="https://code.google.com/p/conemu-maximus5/">Conemu</a> for command line work</li>
+
+<li>
+<a href="http://nodejs.org/">NodeJS</a> for running the simple local web server</li>
+</ul>
+
+<p>Honorable mentions:</p>
+<ul><li>
+<a href="http://gruntjs.com/">GruntJS</a> is an awesome tool
+for scripting your build process (I don't need it in this web app,
+although I use it generally for building both C# and Javascript
+applications)</li></ul>
+
+
+
+<h2>
+<a id="application-walkthrough" class="anchor" href="#application-walkthrough" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Application_Walkthrough">Application Walkthrough</a>
+</h2>
+
+<h3>
+<a id="overview-1" class="anchor" href="#overview-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h3>
+
+<p>In this section we walk-through the HTML and code for
+the flowchart application and understand how the application
+interacts with
+the flowchart view-model. We will mostly be looking at <em>index.html </em>and <em>app.js</em>.</p>
+
+<p>In the process we'll get a feel for how an AngularJS application works.</p>
+
+<p>The following diagram shows the <a href="http://docs.angularjs.org/guide/module">AngularJS modules</a> in the application and the dependencies between them:</p>
+
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/AngularJS-modules.png"></p>
+
+
+<p>The next diagram overviews the files in the project:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Project-Files.png"></p>
+
+
+<p>And drilling down into the <em>flowchart</em> directory:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Flowchart-Files.png"></p>
+
+<h3>
+<a id="application-setup" class="anchor" href="#application-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Application Setup</h3>
+<p>Our entry point into the application is <em>index.html</em>. This contains the HTML that defines the application UI and references the necessary scripts.</p>
+
+<p>Traditionally scripts are included within the <em>head</em> element, although here only a single script is included in the <em>head</em>. This is the script that enables 
+    <a href="https://npmjs.org/package/node-live-reload">live reload</a> support:</p>
+
+<pre>&lt;script src="http://localhost:35729/livereload.js?snipver=1"&gt;&lt;/script&gt;</pre>
+
+
+<p>Live reload enables automatic refresh of the page within the browser
+whenever the the source files have changed. This is what makes
+Javascript development so productive, you can change the code and have
+the application reload and restart automatically, no compilation is
+needed, no manual steps are needed. The feedback loop is substantially
+reduced.</p>
+
+<p>Live reload can also be achieved by using a browser plugin instead of adding a script. I opt for the script usually 
+so that development can happen on any machine without requiring a browser plugin. You probably don't want live reload
+in production of course, so your production server should remove this script.</p>
+
+<p>To try out live reload locally ensure you have installed the <a href="https://npmjs.org/package/node-live-reload">NodeJS plugin</a> and 
+    run <em>node-live-reload</em> from the directory that contains the web page.
+
+</p><p>All other scripts are included from the end of the <em>body</em>
+element. This allows the scripts to be loaded asynchronously as the
+body of the web page is loaded. Whether scripts are included in the <em>head</em> or the <em>body</em> depends how you need your application to work.</p>
+
+
+<p>The first two scripts are <a href="http://en.wikipedia.org/wiki/Jquery">jQuery</a> and <a href="http://en.wikipedia.org/wiki/AngularJS">AngularJS</a>, the core libraries that this application builds on:</p>
+
+<pre>&lt;script src="lib/jquery-2.0.2.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="lib/angular-1.2.3.js" type="text/javascript"&gt;&lt;/script&gt;</pre>
+
+
+<p>Next are the scripts that contain reusable code, including SVG, mouse handling and the flowchart:</p>
+
+<pre>&lt;script src="debug.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="flowchart/svg_class.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="flowchart/mouse_capture_directive.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="flowchart/dragging_directive.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="flowchart/flowchart_viewmodel.js" type="text/javascript"&gt;&lt;/script&gt;
+&lt;script src="flowchart/flowchart_directive.js" type="text/javascript"&gt;&lt;/script&gt;</pre>
+
+
+<p>The application code is included last:</p>
+
+<pre>&lt;script src="app.js" type="text/javascript"&gt;&lt;/script&gt;</pre>
+
+<p>Now back to the top of <em>index.html</em>, the body element contains a number of important attributes:</p>
+
+
+
+
+
+
+<pre>&lt;body
+    ng-app="app" 
+    ng-controller="AppCtrl"
+    mouse-capture
+    ng-keydown="keyDown($event)"
+    ng-keyup="keyUp($event)"
+    &gt;</pre>
+
+
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngApp"><em>ng-app</em></a> designates the root element that contains the <em>AngularJS application. </em>The value of this attribute specifies the <a href="http://docs.angularjs.org/guide/module"><em>AngularJS module</em></a> that contains the application code. This is the most important attribute in the application because this is what <em>bootstraps</em> AngularJS. Without <em>ng-app </em>there is no AngularJS application. In this instance we have specified <em>app</em> which links the <a href="http://en.wikipedia.org/wiki/Document_Object_Model">DOM</a> to our <em>app </em>module which is registered in app.js, we'll take a look at that in a moment.  With the ng-app
+and the AngularJS source code included in the page, the AngularJS app
+is bootstrapped automatically. If necessary, for example to
+control initialization order, you can also <a href="http://stackoverflow.com/questions/16537783/which-method-should-i-use-to-manually-bootstrap-my-angularjs">manually bootstrap the AngularJS app</a>. It is interesting to note here that <em>ng-app</em>
+is applied to the entire body of the web page. This suits me because I
+want the entire page to be an AngularJS application, however it is
+also possible to put <em>ng-app</em> on any sub-element and thus only allow a portion of your page to be controlled by AngularJS.</p>
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngController"><em>ng-controller</em></a><em> </em>assigns an <a href="http://docs.angularjs.org/guide/controller"><em>AngularJS</em></a><a href="http://docs.angularjs.org/guide/controller"> </a><a href="http://docs.angularjs.org/guide/controller"><em>controller</em></a><em> </em>to the body of the page. Here <em>AppCtrl</em> is assigned which is the root controller for the entire application.</p>
+
+<p><em><a href="#Mouse_Capture_Service">mouse-capture</a> </em>is a custom attribute I have created to manage mouse capture within the application. </p>
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngKeyup">ng-keydown</a> and <a href="http://docs.angularjs.org/api/ng.directive:ngKeydown">ng-keyup</a> link the DOM events to Javascript handler functions.</p>
+
+
+
+<p>If you already know HTML but don't know AngularJS, by now you may
+have guessed that AngularJS gives you the ability to create custom HTML
+attributes to wire behavior and logic to your <a href="http://en.wikipedia.org/wiki/User_interface_markup_language">declarative user interface</a>.
+If you don't realize how amazing this is I suggest you go and do some
+traditional web programming before coming back to AngularJS. AngularJS
+allows the extension of HTML with new elements and attributes using <a href="http://docs.angularjs.org/guide/directive"><em>AngularJS directives</em></a>. </p><p>The flow-chart element is a custom element used to insert a flowchart into the page:<br></p>
+
+
+
+
+
+<pre>&lt;flow-chart
+    style="margin: 5px; width: 100%; height: 100%;"
+    chart="chartViewModel"
+    &gt;
+&lt;/flow-chart&gt;</pre>
+
+<p>The <em>flow-chart</em> element is defined by a directive that
+injects a HTML/SVG template into the DOM at this point. The directive
+coordinates the components that make up the flowchart. It attaches
+mouse input
+handlers to the DOM and translates them into actions performed against
+the view-model.</p>The <em>chart</em> attribute of the <em>flow-chart</em> element data-binds the view-model from the application's <a href="http://docs.angularjs.org/guide/scope"><em>scope</em></a> into the flowchart's <em>scope</em>.
+A scope is a Javascript object that contains the variables and functions
+that are accessible from HTML/SVG via data-binding. In
+this case we are binding <em>chartViewModel</em> to the <em>chart</em> attribute as illustrated by the following diagram:<br>
+
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Chart-attribute-data-binding.png"></p>
+
+
+
+
+<h3>
+<a id="application-module-setup" class="anchor" href="#application-module-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Application Module Setup</h3>
+
+
+<p>Let's look at <em>app.js</em> to see the application's setup of the data-model. The first line registers the <em>app </em>module:</p>
+
+<pre>angular.module('app', ['flowChart', ])</pre>
+
+
+<p>Using the <a href="http://docs.angularjs.org/api/angular.module"><em>module</em></a> function the <em>app</em>   
+<a href="http://docs.angularjs.org/guide/module">module</a> is registered. 
+This is the same <em>app</em> that was referenced by <em>ng-app="app" </em>in <em>index.html</em>.
+The first parameter is the name of the module. The second parameter is
+a list of modules that this module depends on. In this case the <em>app</em> module depends on the <em>flowChart</em> module. The <em>flowChart </em>module contains the flowchart directive and associated code, which we look at later.</p>
+
+<p>After the module, an <a href="http://docs.angularjs.org/guide/dev_guide.services.understanding_services">AngularJS service</a> is <a href="http://docs.angularjs.org/guide/dev_guide.services.creating_services">registered</a>.
+This is the simplest example of a service and in a moment you will see
+how it is used. This service simply returns the browser's <a href="http://www.w3schools.com/jsref/met_win_prompt.asp"><em>prompt</em></a><em> </em>function:</p>
+
+
+
+<pre>.factory('prompt', function () {
+    return prompt;
+}</pre>
+
+
+<p>Next the application's <a href="http://docs.angularjs.org/guide/controller">controller</a> is registered:</p>
+
+
+
+
+<pre>.controller('AppCtrl', ['$scope', 'prompt', function AppCtrl ($scope, prompt) {
+    // ... controller code ...
+}])
+;</pre>
+
+<p>The second parameter to the controller function is an array that contains two strings and a function. The parameters of the
+function have the same names as the strings in the array. </p>
+
+<p>If it wasn't for <a href="http://en.wikipedia.org/wiki/Minification_%28programming%29">minification</a> we could define the controller more simply like this:</p>
+
+
+
+
+<pre>.controller('AppCtrl', function AppCtrl ($scope, prompt) {
+    // ... controller code ...
+})
+;</pre>
+
+<p>In the second case the array has been replaced only by the function which
+is simpler but works only during development and not in production.
+AngularJS instances the
+controller by calling the registered <a href="http://pivotallabs.com/javascript-constructors-prototypes-and-the-new-keyword/">Javascript constructor function</a>. AngularJS knows to instance this particular controller because it was specified by name in the HTML using <em>ng-controller="AppCtrl". </em>The controller's parameters are then satisfied by <a href="http://docs.angularjs.org/guide/di">dependency injection</a> based on parameter name. The AngularJS implementation of dependency injection is so simple,
+seamless and reliable that it has convinced me in general that a good
+dependency injection framework should be a permanent part of my
+programming toolkit.</p>
+
+<p>Of course the simple case doesn't work in production where the
+application has been minified. The parameter names will have been
+shortened or mangled, so we must provide the
+explicit list of dependency names before the constructor function. It
+is a pity really that we have to do this, as the implicit method of
+dependency specification is more elegant.</p>
+
+<p>The <em>$scope</em> parameter is the scope automatically created by
+AngularJS for the controller.  In this case the scope is
+associated with the <em>body</em> element. The <a href="http://stackoverflow.com/questions/12648543/angularjs-and-its-use-of-dollar-variables">dollar prefix</a> here indicates that <em>$scope</em>
+is provided by AngularJS itself. The dollar sign in Javascript is
+simply a character that can be used in an identifier, it has no special
+meaning to the interpreter. I suggest you don't use $ for your
+own variables because then you can't easily identify the variables
+provided by AngularJS.</p>
+
+
+
+
+
+<p>The <em>prompt </em>parameter is the <em>prompt</em> service that we saw a moment ago. AngularJS automatically instances the <em>prompt</em> service from the factory we registered earlier. The question you might be asking now is why decouple the <em>prompt</em> service from the application controller? Well generally it so that we can unit-test
+the application controller, even though I don't bother testing the
+application code in this case (although I do test the flowchart code,
+which you'll see later). The decoupling means the prompt service can be
+<a href="http://en.wikipedia.org/wiki/Mock_object">mocked</a> thus <a href="http://c2.com/cgi/wiki?UnitTestIsolation">isolating</a> the code that we want to test. In this case, the only reason I decoupled the prompt<em> </em>service is simply because I wanted to take the opportunity to demonstrate in the simplest scenario how and why to use a service.</p>
+
+<h3>
+<a id="application-controller-setup" class="anchor" href="#application-controller-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Application Controller Setup</h3><p>Now let's break down the application controller from app.js:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>.controller('AppCtrl', ['$scope', 'prompt', function AppCtrl ($scope, prompt) {
+    // ... Various private variables used by the controller ...
+
+    // ... Create example data-model of the chart ...
+
+    // ... Define application level key event handlers ...
+
+    // ... Functions for adding/removing nodes and connectors ...
+
+    // ... Create of the view-model and assignment to the AngularJS scope ...
+}])
+;</pre>
+
+<p>For the moment we will skip the details of the chart data-model. We will come back to that next section.</p>
+
+<p>The most important thing that happens in the application controller
+is the instantiation of the view-model at the end of the function:</p>
+
+<pre>$scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel);</pre>
+
+<p>C<em>hartViewModel</em> wraps the data-model and is assigned to the scope making it accessible from
+the HTML. This allows us to data-bind the <em>chart</em> attribute to <em>chartViewModel</em> as we have seen in <em>index.html</em>:</p>
+
+
+
+
+<pre>&lt;flow-chart
+    style="margin: 5px; width: 100%; height: 100%;"
+    chart="chartViewModel"
+    &gt;
+&lt;/flow-chart&gt;</pre>
+
+
+
+<p>The application controller creates the flowchart view-model
+so that it may have direct access to its services. This was an important
+design decision. Originally the application created only the data-model
+which was passed directly to the flowchart directive, internally then the
+flowchart directive wrapped the data-model in the view-model. I found
+that this strategy gave the application inadequate control over the UI. As an
+example consider deleting selected flowchart items. The delete key is handled and the application must call into the view-model to delete the <em>currently selected</em>
+flowchart items. The initial strategy was to delete the elements
+directly
+from the data-model and have the directive detect this and update the
+view-model accordingly, however this failed because there is no way to
+know from the data which items are selected! In addition it made the
+flowchart directive more complicated because it would now have to watch the data-model changes,
+normally it just watches the view-model and this happens automatically
+anyway.  A naive approach would have been to add fields to
+the data-model to indicate which items are selected,
+but this would be bad design: polluting the data-model with
+view specific
+concepts! In any case, changing the data-model to support selection (or
+other view features) would mean that you can't then share the
+data-model
+between completely different kinds of views, so you can see that even
+in
+principle it is just wrong to combine the view-model and data-model
+concepts. The better solution is to have a
+view-model that is distinct from the flowchart
+directive and mimics the structure of the data-model. The application
+is then put in direct control of that
+view-model so it can be manipulated directly.</p><p>The following diagram indicates the dependencies between the application and the flowchart components:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Application_-directive-and-VM.png"></p>
+
+<p>As an example of how the application interacts with the view-model we will look at the previously mentioned delete selected feature, that allows deletion of flowchart items. <a href="http://docs.angularjs.org/api/ng.directive:ngKeyup">ng-keyup</a> is handled for the body element:</p>
+
+<pre>ng-keyup="keyUp($event)"</pre>
+
+
+<p>The browser's <a href="http://www.w3schools.com/jsref/event_onkeyup.asp">onkeyup</a> event is bound to <em>keyUp</em> in the application scope. The <em>$event</em> object is made available for use by AngularJS and is passed as a parameter to <em>keyUp</em>. This should be pretty much the same as the <a href="http://en.wikipedia.org/wiki/Jquery">jQuery</a> event object, although the <a href="http://docs.angularjs.org/api">AngularJS docs</a> doesn't have much to say about it.</p>This diagram illustrates the binding:
+
+<p><img src="http://www.codeproject.com/KB/scripting/709340/ng-keyUp-binding.png" alt=""></p>
+
+<p>The <em>keyUp</em> function is defined in <em>app.js </em>and assigned directly to the application scope:</p>
+
+
+
+
+
+
+
+
+
+
+
+<pre>$scope.keyUp = function (evt) {
+
+    if (evt.keyCode === deleteKeyCode) {
+        //
+        // Delete key.
+        //
+        $scope.chartViewModel.deleteSelected();
+    }
+
+    // ... handling for other keys ...
+};</pre>
+
+<p>The <em>keyUp</em> function simply calls <em>deleteSelected </em>on the
+view-model. This is an example of the application directly manipulating
+the flowchart view-model, later we'll have a closer look at this
+function.</p>
+
+
+
+
+
+
+
+
+
+
+<h3>
+<a id="flowchart-data-model-setup" class="anchor" href="#flowchart-data-model-setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flowchart Data Model Setup</h3>
+<p>Let's back up and look at the setup of the flowchart's data-model.</p>
+
+<p>The example-data model is defined inline in <em>app.js:</em></p>
+
+
+
+
+
+
+
+
+
+
+<pre>var chartDataModel = {
+    nodes: [
+        // Nodes defined here.
+    ],
+    connections: [
+        // Connections defined here.
+    ]
+};</pre>
+
+
+<p>Then it is wrapped by the view-model:</p>
+
+<pre>$scope.chartViewModel = new flowchart.ChartViewModel(chartDataModel);</pre>
+
+
+<p>We could also have <a href="http://en.wikipedia.org/wiki/Ajax_%28programming%29">asynchronously loaded</a> the data-model as a <a href="http://en.wikipedia.org/wiki/Json">JSON</a> file.</p>
+
+
+
+<p>Before digging further into the structure of the data-model, you may want to develop
+a better understanding of the components of a flowchart. Rather
+than prepare fresh diagrams, I'll refer to those from my older
+article. Please take a look at the <a href="http://www.codeproject.com/Articles/182683/NetworkView-A-WPF-custom-control-for-visualizing-a#Overview">Overview of Concepts</a> in that article and then come back.  ...</p>
+
+<p>Ok, so you read the overview right?  And you know the difference between nodes, connectors and connections.</p>
+
+<p>Here is the definition of a single node as defined in <em>app.js</em>:</p>
+
+<p><img src="http://www.codeproject.com/KB/scripting/709340/Node-data-model.png"></p>
+
+
+<p>Here is the definition of a single connection:</p>
+
+<p><img src="http://www.codeproject.com/KB/scripting/709340/Connection-data-model.png"></p>
+
+
+<p>Connections in the data-model reference their attached nodes by IDs.  Connectors are referenced by
+index. An alternative approach would be to drop the node reference and
+reference only the connector by an ID that is unique for each connector
+in the flowchart.</p>
+
+
+
+
+
+<h2>
+<a id="flowchart-walkthrough" class="anchor" href="#flowchart-walkthrough" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Flowchart_Walkthrough">Flowchart Walkthrough</a>
+</h2>
+
+<h3>
+<a id="overview-2" class="anchor" href="#overview-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Overview</h3>
+
+<p>This section examines the implementation of the flowchart directive, controller, view-model and template.</p>
+
+<p>An <a href="http://docs.angularjs.org/guide/directive">AngularJS directive</a> is registered with the name flow-chart.  When AngularJS bootstraps and encounters the <em>flow-chart</em> element in the DOM it automatically instantiates the directive. The directive then specifies a template and this replaces the <em>flow-chart</em> tag in the HTML. The directive also specifies the controller and dictates the setup of its scope.</p>
+
+<p>The flowchart directive controls and coordinates the other components as shown in the following diagram:</p>
+
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Flowchart-internals.png"></p>
+
+<p>The flowchart directive and controller are defined in <em>flowchart_directive.js</em> under the <em>flowchart</em> directory. The first line defines the AngularJS module:</p>
+
+<pre>angular.module('flowChart', ['dragging'] )</pre>
+
+
+<p>The module depends on the <a href="#Dragging_Service"><em>dragging</em></a> module, which provides <em>mouse handling </em>services.</p>
+
+<p>This module actually contains two AngularJS directives:</p>
+
+
+
+
+
+
+
+<pre>.directive('flowChart', function() {
+    // ...
+})
+.directive('chartJsonEdit', function () {
+    // ...
+})</pre>
+
+
+<p>The <em>flowChart </em>directive specifies the <a href="http://en.wikipedia.org/wiki/Svg">SVG</a> template and the flowchart controller.  We will look at this in detail in the next section.</p>
+
+<p>The <em>chartJsonEdit</em> directive is a helper that allows us to see and edit the flowchart's <a href="http://en.wikipedia.org/wiki/Json">JSON</a>
+representation alongside the visual SVG representation. This is mostly
+for testing, debugging and helping understand how the flowchart works,
+you probably wont't use this in production, but I have left it in as it provides a good example of how two
+<em>views</em> can display the same <em>view-model</em>,  we'll look into this in more detail later.</p>
+
+<p>After the two directives, the flowchart controller takes up the majority of this file:</p>
+
+
+
+
+<pre>.controller('FlowChartController', ['$scope', 'dragging', '$element', 
+    function FlowChartController ($scope, dragging, $element) {
+        // ...
+    }
+])
+;</pre>
+
+<p>In the coming sections we will cover each of the flowchart components in detail.</p>
+
+<h3>
+<a id="components-overview" class="anchor" href="#components-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Components Overview</h3><h4>
+<a id="flowchart-directive" class="anchor" href="#flowchart-directive" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flowchart Directive</h4>
+
+
+<p>Using a directive to implement the flowchart is essentially making it into a reusable <a href="http://en.wikipedia.org/wiki/GUI_control"><em>control</em></a>. The entire directive is small and self-contained:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>.directive('flowChart', function() {
+    return {
+        restrict: 'E',
+        templateUrl: "flowchart/flowchart_template.html",
+        replace: true,
+        scope: {
+            chart: "=chart",
+        },
+
+        controller: 'FlowChartController',
+    };
+})</pre>
+
+
+<p>The directive is restricted to use as a HTML element:</p>
+
+<pre>restrict: 'E'</pre>
+
+
+<p>This effectively creates a new HTML element, <em>such is the power of
+AngularJS</em>, you can extend HTML with your own elements and attributes.
+There are other codes that can be applied here, for example, restricting to use as a HTML
+attribute (effectively creating a new HTML attribute):</p>
+
+<pre>restrict: 'A'</pre>
+
+
+<p>The next two lines specify the flowchart's template and that it should replace the <em>flow-chart</em> element:</p>
+
+
+<pre>templateUrl: "flowchart/flowchart_template.html",
+replace: true,</pre>
+
+
+<p>This causes the template to be injected into the DOM in place of the <em>flowchart</em> element:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Template-replacement.png"></p>
+
+<p>Next, an <a href="http://umur.io/angularjs-directives-using-isolated-scope-with-attributes/">isolated scope</a> is setup:</p>
+
+
+
+<pre>scope: {
+    chart: "=chart",
+},</pre>
+
+<p>This has the effect of creating a new child scope
+for the directive that is independent of the application's scope. 
+Normally, creation of a new scope (say by a sub-controller) results in a child scope being nested under the parent scope.
+The child scope is linked to the parent via <a href="http://jimhoskins.com/2012/12/14/nested-scopes-in-angularjs.html">the prototypal inheritance chain</a>, therefore the fields and functions of the parent are avaible via the child and may even be overridden by the child. 
+An isolated scope breaks this connection, which is important for a reusable control like the flowchart as we don't want the two scopes interfering with each other. </p>
+
+<p>Note the line:</p>
+
+<pre>chart: "=chart",</pre>
+
+
+<p>This causes the <em>chart </em>attribute of the HTML element to be <a href="http://en.wikipedia.org/wiki/Data_binding">data-bound</a> to the <em>chart</em>
+variable in the scope. In this way we connect the chart's
+view-model from the application scope to the flowchart scope in a <a href="http://en.wikipedia.org/wiki/Declarative_programming">declarative manner</a>.</p>
+
+<p>The last part of the directive links it to the controller:</p>
+
+<pre>controller: "FlowChartController",</pre>
+
+
+<p>AngularJS creates the controller by name when the directive is instantiated.</p>
+
+<p>Most examples of directives you see in the wild have a <em>link</em> function. In this case I use a controller instead of a <em>link</em> function to contain the directive's UI logic, I'll soon explain why. </p>
+
+
+
+<h4>
+<a id="json-editing-directive" class="anchor" href="#json-editing-directive" aria-hidden="true"><span class="octicon octicon-link"></span></a>JSON Editing Directive</h4>
+
+
+<p>The other directive defined in the same file is <em>chartJsonEdit</em>, which displays the flowchart's data-model as editable JSON text. This is really just a helper and not a crucial flowchart component.
+I use it for debugging and testing and it can also be useful to
+understand how things work generally. I include it here mainly because
+it is interesting to see how two separate views (if we consider the directives as views) can display the same view-model and stay synchronized.</p>I'll include the full code and comments here. The main thing to note is how the syncrhonization is achieved. <a href="http://docs.angularjs.org/api/ng.%24rootScope.Scope#methods_%24watch">$watch</a> watches
+for a change in the data-model. Whenever a change is detected the data-model is seralized to JSON and displayed in the
+textbox. Whenever the user updates the textbox an event is invoked and
+the view-model is rebuilt from the updated data.  A <a href="http://docs.angularjs.org/api/ng.%24rootScope.Scope#methods_%24digest">$digest</a> is invoked manually so that AngularJS responds to the updated view-model.<p></p>
+
+<pre>.directive('chartJsonEdit', function () {
+    return {
+        restrict: 'A',
+
+        scope: {
+            viewModel: "="
+        },
+
+        link: function (scope, elem, attr) {
+            //
+            // Serialize the data model as json and update the textarea.
+            //
+            var updateJson = function () {
+
+                if (scope.viewModel) {
+                    var json = JSON.stringify(scope.viewModel.data, null, 4);
+                    $(elem).val(json);
+                }
+            };
+
+            //
+            // First up, set the initial value of the textarea.
+            //
+            updateJson();
+
+            //
+            // Watch for changes in the data model and update the textarea whenever necessary.
+            //
+            scope.$watch("viewModel.data", updateJson, true);
+
+            //
+            // Handle the change event from the textarea and update the data model
+            // from the modified json.            
+            //
+            $(elem).bind("input propertychange", function () {
+
+                var json = $(elem).val();
+                var dataModel = JSON.parse(json);
+                scope.viewModel = new flowchart.ChartViewModel(dataModel);
+
+                scope.$digest();
+            });
+        }
+    };
+})</pre>
+
+
+
+
+
+
+<h4>
+<a id="flowchart-controller" class="anchor" href="#flowchart-controller" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flowchart Controller</h4>
+<p>The purpose of the controller is to provide the input event handlers that are bound to the DOM by the template.  Event handling is then generally routed to the view-model. As the UI logic is
+delegated to the view-model, the controller's job is simply to translate input
+events into view-model operations. This job could have easily been done by the directive's <em>link</em> function, however separating the UI logic out to the controller
+has made it much easer to unit-test as the controller
+can be instantiated without a DOM.</p>
+
+<p>The controller is registered in <em>flowchart_directive.js</em> after the two directives and takes up most of the file. The controller itself is a <a href="http://pivotallabs.com/javascript-constructors-prototypes-and-the-new-keyword/">Javascript constructor function</a> registered via the flowchart module's <a href="http://docs.angularjs.org/api/angular.Module"><em>controller</em></a> function:</p>
+
+
+
+
+
+<pre>.controller('FlowChartController', ['$scope', 'dragging', '$element', 
+    function FlowChartController ($scope, dragging, $element) {
+        // ...
+    }
+])
+;</pre>
+
+<p>The controller is registered with the name <em>FlowChartController</em>, which is the name used to reference the controller from the directive:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Directive_references_controller.png"></p>
+
+
+<p>The controller parameters are automaticatically created and <a href="http://en.wikipedia.org/wiki/Dependency_injection">dependency injected</a> by AngularJS when the controller is instantiated. As we saw with the application
+controller the names of the parameters are specified twice. If we
+didn't need <a href="http://en.wikipedia.org/wiki/Minification_%28programming%29">minification</a>
+we could get by with the names only specified once, as the names of the parameters themselves.</p>
+
+<p><em>$scope</em> is the directive's isolated scope, containing a <em>chart</em> field that is the view-model that has been transferred
+over from the application's scope.</p>
+
+<p><em>dragging</em> is a custom service that helps with mouse handling, which is so interesting it gets its <a href="#Dragging_Service">own section</a>.</p>
+
+<p><em>$element </em>is the HTML element that the controller is attached to. This parameter is easily <a href="http://en.wikipedia.org/wiki/Mock_object">mocked</a> for unit-testing, which allows testing of the controller without actually instantiating the DOM.</p>
+
+
+<p>In the first line of the controller we cache the <a href="http://bonsaiden.github.io/JavaScript-Garden/#function.this"><em>this</em></a> variable as a local variable named <em>controller</em>:</p>
+
+<pre>var controller = this;</pre>
+
+<p>This is the same as Javascript's usual <a href="http://stackoverflow.com/questions/80084/in-javascript-why-is-the-this-operator-inconsistent"><em>var that = this</em></a><em> </em>idiom and is required so that the <em>this </em>variable, i.e. the flowchart controller, can be accessed from anonymous callback functions.</p>
+
+<p>Next we cache a reference to the <a href="http://www.w3schools.com/jsref/dom_obj_document.asp"><em>document</em></a><em> </em>and <a href="http://en.wikipedia.org/wiki/Jquery"><em>jQuery</em></a>:</p>
+
+
+
+
+
+<pre>this.document = document;
+
+this.jQuery = function (element) {
+    return $(element);
+}</pre>
+
+<p>This enables unit-testing as <em>document</em> and <em>jQuery </em>are easily replaced by mock objects.</p>
+
+<p>Next we setup the scope variables, followed by a
+number of the controller's functions. Then event handlers, such as <em>mouseDown</em>, are assigned to the scope 
+to be referenced from the template.</p>
+
+<p>That's all the detail on the controller for now, there is still a lot to cover here and we'll deal with it
+piece by piece in coming sections.</p>
+
+
+
+<h4>
+<a id="flowchart-template" class="anchor" href="#flowchart-template" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flowchart Template</h4>
+<p>The template defines the SVG that makes up the flowchart visuals. It is entirely self-contained with no sub-templates. Sub-templates are of course possible with AngularJS (and usually desirable), but they can cause <a href="#Problems_with_SVG">problems with SVG</a>.
+The template generates the UI from the view-model and determines how
+DOM events are bound to functions in the scope.</p>
+
+<p>The template can be found in <em>flowchart_template.html</em>. After understanding the flowchart directive we know that the template's content completely replaces the <em>flow-chart</em> element in <em>index.html</em>.</p>
+
+<p>The entire template is wrapped in a single root <a href="http://www.w3schools.com/svg/svg_inhtml.asp">SVG element</a>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>&lt;svg
+    class="draggable-container"
+    xmlns="http://www.w3.org/2000/svg"
+    ng-mousedown="mouseDown($event)"
+    ng-mousemove="mouseMove($event)"  
+    &gt;
+    &lt;defs&gt;
+        &lt;!-- ... --&gt;
+    &lt;/defs&gt;
+
+    &lt;!-- ... content ... --&gt;
+&lt;/svg&gt;</pre>
+
+
+<p>Mouse handling is performed at multiple levels in the DOM. <em>Mouse down</em> and <em>mouse move</em>
+are handled on the SVG element to implement <a href="#Drag_Selection">drag selection</a> and <a href="#Mouse_Over_and_SVG_Hit_Testing">mouse
+over</a>. Other examples of mouse handling can be found through-out the
+template as it underpins multiple features, such as: <em>selection of nodes and connections</em>, <em>dragging of
+nodes</em> and <em>dragging of connections</em>.</p>
+
+
+
+
+
+<p>The <a href="http://tutorials.jenkov.com/svg/defs-element.html">defs</a> element defines a single reusable SVG <a href="http://www.w3schools.com/svg/svg_grad_linear.asp"><em>linearGradient</em></a><em> </em>that
+is used to fill the background of the nodes. The remainder of the
+template is the content that displays the nodes, connectors and
+connections. Near the end of the template graphics are defined for the <em>dragging connection</em> (the connection the user is dragging out) and the <em>drag selection rectangle</em>.</p>
+
+
+
+
+
+
+
+<h4>
+<a id="flowchart-view-model" class="anchor" href="#flowchart-view-model" aria-hidden="true"><span class="octicon octicon-link"></span></a>Flowchart View-Model</h4>
+
+
+<p>The view-model closely wraps the data-model and represents it to the
+view. It provides UI logic and coordinates operations on
+the data. The view-model can be found in <em>flowchart_viewmodel.js</em>.</p>
+
+
+
+<p>So really, why have a view-model at all?</p>
+
+<p>It's true that all the flowchart code could live in the flowchart
+controller, or even in the flowchart directive. We already know that
+the flowchart controller is separate for ease
+of unit-testing. Separating the <em>view-model</em> also helps 
+unit-testing, as well as improving modularity and simplifying the code. 
+However, the primary reason for separation of the view-model is that it 
+allows the application code to interact directly with
+the view-model, which is much more convenient than interacting with the directive or controller.
+Simply put, the application owns the view-model which it passes to the directive/controller. 
+The application is then free to directly manipulate the view-model
+and the application code doesn't interface at all with the directive
+or controller.</p>
+
+
+
+<em>flowchart_viewmodel.js </em>contains multiple <a href="http://www.phpied.com/3-ways-to-define-a-javascript-class/">Javascript classes</a> that comprise the view-model: <em>ConnectorViewModel</em>, <em>NodeViewModel</em>, <em>ConnectionViewModel</em> and <em>ChartViewModel</em>.
+To be sure this file is borderline too large! If much more code were 
+added I'd refactor and split it out into a separate file
+for each component. All the view-model <a href="http://pivotallabs.com/javascript-constructors-prototypes-and-the-new-keyword/">constructor functions</a> are contained within the <em>flowchart </em>object which creates a <a href="http://thanpol.as/javascript/development-using-namespaces/">namespace</a> for the view-model code.
+
+
+
+<p>All of the constructor functions take as a parameter (at least) the data-model to be wrapped-up. The data-model in the simplest case can be an empty object:</p>
+
+
+<pre>var chartDataModel = {};
+var chartViewModel = new flowchart.ChartViewModel(chartDataModel);</pre>
+
+
+
+
+<p>When the data-model is empty, the view-model will flesh it out as necessary. 
+A view-model can also be created from a fully or partially complete data-model, 
+for example one that is AJAX'd as JSON:</p>
+
+
+
+
+
+
+
+
+
+<pre>var chartDataModel = {
+    nodes: [
+        // ...
+    ],
+    connections: [
+        // ...
+    ]
+};
+
+var chartViewModel = new flowchart.ChartViewModel(chartDataModel);</pre>
+
+
+<p>View-models for each node are created in a similar way:</p>
+
+<pre>var nodeViewModel = new flowchart.NodeViewModel(nodeDataModel);</pre>
+
+
+<p>Connectors are a bit different, the x, y coordinates of the
+connector are computed and passed in, along with a reference to the
+view-model of the parent node:</p>
+
+<pre>var connectorViewModel = new flowchart.ConnectorViewModel(connectorDataModel, computedX, computedY, parentNodeViewModel);</pre>
+
+
+<p>Connections are different again and given references to the view-models for the source and dest connectors they are attached to:</p>
+
+<pre>var connectionViewModel = new flowchart.ConnectionViewModel(connectionDataModel, sourceConnectorViewModel, destConnectorViewModel);</pre>
+
+
+<p>The following diagram illustrates how the view-model wraps the data-model:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/VM-wraps-data-model.png"></p>
+
+
+<p>In summary, the flowchart view-model wraps up numerous functions for
+manipulating and presenting the flowchart. Including selection, drag
+selection, deleting nodes and connections and creating new connections.</p>
+
+
+
+
+<h4>
+<a id="unit-tests" class="anchor" href="#unit-tests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Unit Tests</h4>
+
+
+<p>TDD and the unit-tests have kept this project alive and kicking
+from the start. The unit tests really came into their own and saved the day when it was
+time to make my code run on multiple browsers (arguably I should have
+been doing this from the beginning, but I'm pretty new to the
+cross-browser stuff).</p>
+
+<p>As a standard unit-test files have the same name as the source file under test, but with <em>.spec </em>on the end.  For example the unit-tests for <em>flowchart_viewmodel.js</em> are in <em>flowchart_viewmodel.spec.js</em>.</p>
+
+<p><a href="http://pivotal.github.io/jasmine/"><em>Jasmine</em></a> is a fantastic testing framework. Along with the code I have included the Jasmine <em>spec runner</em>, the HTML page that runs the tests. It is under the <em>jasmine</em> directory. When you have the web server running you can point your browser at <a href="http://localhost:8888/jasmine/SpecRunner.html">http://localhost:8888/jasmine/SpecRunner.html</a> to run the unit-tests.</p>
+
+<h3>
+<a id="graph-concepts" class="anchor" href="#graph-concepts" aria-hidden="true"><span class="octicon octicon-link"></span></a>Graph Concepts</h3>
+
+<p>In this section I discuss each element of the flowchart and what is required to represent it in the UI.
+
+</p><h4>
+<a id="representing-nodes" class="anchor" href="#representing-nodes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Representing nodes</h4>
+
+
+<p>To render a collection of things, eg flowchart nodes, we use AngularJS's <a href="http://docs.angularjs.org/api/ng.directive:ngRepeat"><em>ng-repeat</em></a>. Here it is used to render all of the nodes in the view-model:</p>
+
+
+
+
+
+
+
+
+
+<pre>&lt;g
+    ng-repeat="node in chart.nodes"
+    ng-mousedown="nodeMouseDown($event, node)"
+    ng-attr-transform="translate({{node.x()}}, {{node.y()}})"
+    &gt;
+
+    &lt;!-- ... node content ... --&gt;
+&lt;/g&gt;</pre>
+
+<p><em>ng-repeat</em> causes the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/g">SVG g element</a> to be expanded out and repeated once for each node. The repetition is driven by the array of nodes supplied by the view-model: <em>chart.nodes</em>. At each repetition a variable <em>node</em> is defined that references the view-model for the node.</p>
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngMousedown"><em>ng-mousedown</em></a><em> </em>binds the mouse down event for nodes to the controller's <em>nodeMouseDown</em> which contains the logic to be invoked when the mouse is pressed on a node, the node itself is passed through as a parameter.</p>
+
+<p><em>ng-attr-transform </em>sets the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/transform">SVG transform</a> attribute to a translation that positions the node according to x, y coordinates from the view-model.</p>
+
+<p><em>ng-attr-&lt;attribute-name&gt;</em> is a new AngularJS feature that sets a given HTML or SVG attribute <em>after</em> evaluating an <a href="http://docs.angularjs.org/guide/expression">AngularJS expression</a>.
+This feature is so new that there doesn't appear to be any
+documentation for it yet, although you will find a mention of it
+(specifically related to SVG) in the <a href="http://docs.angularjs.org/guide/directive">directive</a> documentation. I'll talk more about the need for <em>ng-attr- </em>in the section <a href="#Problems_with_SVG">Problems with SVG</a>, meanwhile we will see it used throughout the template.</p>
+
+<p>The background of each node is an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">SVG rect</a>:</p>
+
+
+
+
+
+
+
+
+
+
+
+<pre>&lt;rect
+    ng-attr-class="{{node.selected() &amp;&amp; 'selected-node-rect' || (node == mouseOverNode &amp;&amp; 'mouseover-node-rect' || 'node-rect')}}"
+    ry="10"
+    rx="10"
+    x="0"
+    y="0"
+    ng-attr-width="{{node.width()}}"
+    ng-attr-height="{{node.height()}}"
+    fill="url(#nodeBackgroundGradient)"
+    &gt;
+&lt;/rect&gt;</pre>
+
+
+
+<p><em>ng-attr-class </em>conditionally sets the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/class">SVG class</a>
+depending on whether the node is selected, unselected or whether the
+mouse is hovered over the node. Other methods of setting SVG class (via jQuery/AngularJS), that normally work for <a href="http://www.w3schools.com/tags/att_global_class.asp">HTML class</a>, don't work so well as I will describe <a href="#Problems_with_AngularJS">later</a>.</p>
+
+<p><em>ng-attr-width</em> and <em>-height </em>set the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/width">width</a> and <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/height">height</a> of the rect.</p>
+
+<p><a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Tutorial/Fills_and_Strokes"><em>fill</em></a> sets the fill of the rect to <em>nodeBackgroundGradient </em>which was defined early in the <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/defs"><em>defs</em></a> section of the SVG.</p>
+
+<p>Next an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/text">SVG text</a> displays the node's name: </p>
+
+
+
+<pre>&lt;text
+    ng-attr-x="{{node.width()/2}}"
+    y="25"
+    text-anchor="middle"
+    alignment-baseline="middle"
+    &gt;
+    {{node.name()}}
+&lt;/text&gt;</pre>
+
+
+<p>The text is centered horizontally by
+anchoring it to the middle of the node. The example here of <em>ng-attr-x</em> really starts to show the power of <a href="http://docs.angularjs.org/guide/expression">AngularJS expressions</a>.
+Here we are doing a computation within the expression to determine the
+horizontal center point of the node, the result of the expression sets
+the x coordinate of the text.</p>
+
+<p>After the text we see two separate sections that display the node's
+input and output connectors. Before we look deeper into the visuals for
+connectors let's have an overview of how the rendered node relates to
+its SVG template.</p>
+
+<p>The <em>ng-repeat</em>:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Node-template.png"></p>
+
+
+<p>Node background and name:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Node-template-2.png"></p>
+
+<h4>
+<a id="representing-connectors" class="anchor" href="#representing-connectors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Representing connectors</h4>
+<p>Input and output connectors are roughly the same and so I will only discuss input connectors and point out the differences.</p>
+
+<p>Here again is a use of <em>ng-repeat</em> to generate multiple SVG elements:</p>
+
+
+<pre>&lt;g
+    ng-repeat="connector in node.inputConnectors"
+    ng-mousedown="connectorMouseDown($event, node, connector, $index, true)"
+    class="connector input-connector"
+    &gt;
+
+    &lt;!-- ... connector content ... --&gt;
+&lt;/g&gt;</pre>
+
+
+
+<p>This looks very similar to the SVG for a node having an <em>ng-repeat </em>and a handler for <em>mouse down</em>. This time a static class is applied to the SVG g element that defines it as both a <em>connector</em> and an <em>input-connector</em>. If it were an output connector it would instead have the <em>output-connector</em> class applied.</p>
+
+<p>Each connector is made from two elements. The first is a text element to display the name:</p>
+
+
+
+<pre>&lt;text
+    ng-attr-x="{{connector.x() + 20}}"
+    ng-attr-y="{{connector.y()}}"
+    text-anchor="left"
+    alignment-baseline="middle"
+    &gt;
+    {{connector.name()}}
+&lt;/text&gt;</pre>
+
+<p>The only difference between the input and output connectors is the expression assigned to the <em>x coordinate</em>. An input connector is on the left of the node and so it is offset slightly to the <em>right</em>. An output connector is on the opposite side and therefore it is offset to the <em>left</em>.</p>
+
+<p>The second element is a <em>circle</em> shape that represents the <em>connection anchor point</em>, this is an <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle">SVG circle</a> positioned at the connector's coordinates:</p>
+
+<pre>&lt;circle
+    ng-attr-class="{{connector == mouseOverConnector &amp;&amp; 'mouseover-connector-circle' || 'connector-circle'}}"
+    ng-attr-r="{{connectorSize}}"   
+    ng-attr-cx="{{connector.x()}}"
+    ng-attr-cy="{{connector.y()}}"
+    /&gt;</pre>
+
+<p><em>ng-attr-class</em> is used to conditionally set the class of the connector depending on whether the mouse is hovered over it. The other attributes set the position and size of the circle.</p>
+
+<p>The following diagram shows how the rendered connectors relate to the SVG template. First the <em>ng-repeat</em>:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Connector-template.png"></p>
+
+<p>And the content of each connector:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Connector-template-2.png"></p>
+
+
+
+
+
+<h4>
+<a id="representing-connections" class="anchor" href="#representing-connections" aria-hidden="true"><span class="octicon octicon-link"></span></a>Representing connections</h4>
+<p>Connections are composed of a curved <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/path">SVG path</a> with <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/circle">SVG circles</a> attached at each end.
+Multiple connections are displayed using the now familiar <em>ng-repeat:</em></p>
+
+<pre>&lt;g
+    ng-repeat="connection in chart.connections"
+    class="connection"
+    ng-mousedown="connectionMouseDown($event, connection)"
+    &gt;
+
+    &lt;!-- ... connection content ... --&gt;
+&lt;/g&gt;</pre>
+
+<p>The coordinates for the curved path are computed by the view-model:</p>
+
+<pre>&lt;path
+    ng-attr-class="{{connection.selected() &amp;&amp; 'selected-connection-line' || (connection == mouseOverConnection &amp;&amp; 'mouseover-connection-line' || 'connection-line')}}"
+    ng-attr-d="M {{connection.sourceCoordX()}}, {{connection.sourceCoordY()}}
+               C {{connection.sourceTangentX()}}, {{connection.sourceTangentY()}}
+                 {{connection.destTangentX()}}, {{connection.destTangentY()}}
+                 {{connection.destCoordX()}}, {{connection.destCoordY()}}"
+    &gt;
+&lt;/path&gt;</pre>
+
+<p>Each end of the connection is capped with a small filled circle.
+The source and dest -ends look much the same, so let's look at the
+source-end only:</p>
+
+<pre>&lt;circle
+    ng-attr-class="{{connection.selected() &amp;&amp; 'selected-connection-endpoint' || (connection == mouseOverConnection &amp;&amp; 'mouseover-connection-endpoint' || 'connection-endpoint')}}"
+    r="5"
+    ng-attr-cx="{{connection.sourceCoordX()}}"
+    ng-attr-cy="{{connection.sourceCoordY()}}"
+    &gt;
+&lt;/circle&gt;</pre>
+
+<p>Now some diagrams to understand the relationship between the rendered connections and the template.</p>
+
+<p>The <em>ng-repeat</em>:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Connection-template.png"></p>
+
+
+<p>The content of a connection:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Connection-template-2.png"></p>
+
+<h3>
+<a id="ui-features" class="anchor" href="#ui-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>UI Features</h3>
+<p>In this section I will cover the implementation of a
+number of UI features. The discussion will cross-cut through
+application, directive, controller, view-model and template to examine
+the workings of each feature.</p>
+
+<h4>
+<a id="selection" class="anchor" href="#selection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Selection</h4>
+
+<p>Nodes and connections can be in either the <em>selected</em> or <em>unselected</em> state. A single left-click <em>selects </em>a node or connection. A click on the background <em>deselects all</em>.  Control + click enables <em>multiple selection</em>.</p>
+
+<p>Supporting selection is a major reason for individually wrapping the
+data-models for nodes and connections in view-models. These view-models
+at their simplest have a <em>_selected</em> boolean field that
+stores the current selection state. This value must be stored in
+the view-model and not in the data-model, to do otherwise would
+unnecessarily pollute the data-model and make it less reusable with
+different types of views.</p>
+
+<p>The view-models for nodes and connections, <em>NodeViewModel</em> and <em>ConnectionViewModel</em>, both have a simple API for managing selection consisting of:</p>
+
+<ul>
+<li>select() to select the node or connection;</li>
+<li>deselect() to deselect it;</li>
+<li>toggleSelected() to change selection based on current state; and</li>
+<li>selected() which returns true when currently selected.</li>
+</ul>
+
+
+<p><em>ChartViewModel</em> has a selection API for managing chart selection as a whole:</p>
+
+<ul>
+<li>selectAll() selects all nodes and connections in the chart;</li>
+<li>deselectAll() deselects everything;</li>
+<li>updateSelectedNodesLocation(...) offsets selected nodes by the specified delta;</li>
+<li>deleteSelected() deletes everything that is selected;</li>
+<li>applySelectionRect(...) selects everything that is contained within the specified rect; and</li>
+<li>getSelectedNodes() retrieves the list of nodes that are selected.</li>
+</ul>
+
+
+<p>The visuals for nodes and connections are modified dynamically according to their <em>selection</em> state. <em>ng-attr-class </em>completely switches classes depending on the result of a call to <em>selected()</em>, for example, setting the class of a node:</p>
+
+<pre>&lt;rect
+    ng-attr-class="{{node.selected() &amp;&amp; 'selected-node-rect' || (node == mouseOverNode &amp;&amp; 'mouseover-node-rect' || 'node-rect')}}"
+    ...
+    &gt;
+&lt;/rect&gt;</pre>
+
+<p>Of course the expression is more complicated because we are also setting the class based on the <em>mouse-over</em> state. If you are new to Javacript I should note that <a href="http://www.grauw.nl/blog/entry/510">the kind of expression</a> used above acts like the <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Conditional_Operator">ternary operator</a>.</p>
+
+<p>When <em>node.selected()</em> returns <em>true</em> the class of the SVG rect is set to <em>selected-node-rect</em>, 
+a class defined in <em>app.css</em>, and modifies the node's visual to indicate that it is selected.</p>
+
+<p>The same technique is also used to conditionally set the class of connections.</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Selected-node.png"></p>
+
+
+<h4>
+<a id="drag-selection" class="anchor" href="#drag-selection" aria-hidden="true"><span class="octicon octicon-link"></span></a>Drag Selection</h4>
+<p>Nodes and connections can also be selected by dragging out a selection rectangle to contain the items 
+to be selected:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Drag_selection.png"></p>
+<p>Drag selection is handled at multiple levels:</p>
+
+<ul>
+<li>The template binds mouse event handlers to the DOM;</li>
+<li>The controller provides the event handlers and coordinates the dragging; and </li>
+<li>The view-model determines which  nodes to select and then selects them.</li>
+</ul>
+
+<p>Ultimately, the final action during drag selection, is to select nodes and connections that are contained within the <em>drag selection rect</em>. The coordinates and size of the rect are passed to <em>applySelectionRect</em>. This function applies the selection in the following steps:</p>
+
+<ul>
+<li>Everything that is initially selected is deselected.</li>
+<li>Nodes are tested against the selection rect and those that are contained within it are selected.</li>
+<li>Connections are selected when they are attached to nodes selected in the previous pass.</li>
+</ul>
+
+
+
+<p>The flowchart controller receives mouse events and coordinates the dragging operation.  <em>Mouse down</em> is the event we are interested in here which is handled by <em>mouseDown</em> in the controller:</p>
+
+
+<pre>&lt;svg
+    class="draggable-container"
+    xmlns="http://www.w3.org/2000/svg"
+    ng-mousedown="mouseDown($event)"
+    ng-mousemove="mouseMove($event)" 
+    &gt;
+
+    &lt;!-- ... --&gt;
+&lt;/svg&gt;</pre>
+
+<p>Looking into <em>mouseDown</em> we see the first use of the <em><a href="#Dragging_Service">dragging service</a>. </em>This
+is a custom service I have created to help manage dragging operations
+in AngularJS. Over the next few sections we'll see multiple examples of
+it and later we'll look at the implementation. The
+dragging service is dependency injected as the <em>dragging</em> parameter to the controller and this allows us to use the service anywhere within the controller.</p>
+
+<p>The first thing to note about <em>mouseDown</em> is that it is attached to <em>$scope </em>and this makes it available for binding in the HTML:</p>
+
+
+
+<pre>$scope.mouseDown = function (evt) {
+    // ...
+};</pre>
+
+
+<p><em>mouseDown</em>'s first task is to ensure nothing is selected. This means that any <em>mouse down</em>
+in the flowchart deselects everything. This is exactly the behavior
+we want when clicking in the background of the flowchart:</p>
+
+
+
+
+
+
+<pre>$scope.mouseDown = function (evt) {
+    $scope.chart.deselectAll();
+
+    // ...
+};</pre>
+
+<p>After deselecting all, <em>startDrag</em> is called on the <em>dragging </em>service to commence the dragging operation:</p>
+
+
+
+
+
+
+
+
+
+<pre>$scope.mouseDown = function (evt) {
+
+    // ... deselect all ...
+
+    dragging.startDrag(evt, {
+        // ...
+    });
+};</pre>
+
+
+<p>The dragging operation will continue until a <em>mouse up </em>is detected, in this case a <em>mouse up</em> on the root SVG element.  Note though that we don't handle <em>mouse up</em> explicitly, it is handled automatically by the <em>dragging service </em>and it is the <em>draggable-container</em> class on the SVG element which identifies it as the element within which dragging will be contained.</p>
+
+<p>Multiple event handlers (or callbacks) are passed as parameters and are invoked at key points in the dragging operation:</p>
+
+
+
+
+
+
+
+
+<pre>dragging.startDrag(evt, {
+
+    dragStarted: function (x, y) {
+        // ...
+    },
+
+    dragging: function (x, y) {
+        // ...
+    },
+
+    dragEnded: function () {
+        // ...
+    },
+});</pre>
+
+
+<ul>
+<li>d<em>ragStarted</em> is called when dragging has commenced;</li>
+<li>dragging is called repeatedly during dragging; and finally </li>
+<li>dragEnded is called when dragging has been ended by the user.</li>
+</ul>
+
+
+<p><em>dragStarted</em> sets up scope variables that track the state of the dragging operation:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>dragging.startDrag(evt, {
+    dragStarted: function (x, y) {
+        $scope.dragSelecting = true;
+        var startPoint = controller.translateCoordinates(x, y);
+        $scope.dragSelectionStartPoint = startPoint;
+        $scope.dragSelectionRect = {
+            x: startPoint.x,
+            y: startPoint.y,
+            width: 0,
+            height: 0,
+        };
+    },
+
+    dragging: // ...
+
+    dragEnded: // ...
+});</pre>
+
+
+
+<p><em>dragSelectionRect </em>tracks the coordinates and size of the
+selection rectangle and is needed to visually display the selection rect.</p>
+
+<p><em>dragging</em> is invoked on each mouse movement during the dragging operation. It continuously updates <em>dragSelectionRect </em>as the rect is dragged by the user:</p>
+
+<pre>dragging.startDrag(evt, {
+    dragStarted: // ...
+
+    dragging: function (deltaX, deltaY, x, y) {
+        var startPoint = $scope.dragSelectionStartPoint;
+        var curPoint = controller.translateCoordinates(x, y);
+        $scope.dragSelectionRect = {
+            x: curPoint.x &gt; startPoint.x ? startPoint.x : curPoint.x,
+            y: curPoint.y &gt; startPoint.y ? startPoint.y : curPoint.y,
+            width: curPoint.x &gt; startPoint.x ? x - startPoint.x : startPoint.x - x,
+            height: curPoint.y &gt; startPoint.y ? y - startPoint.y : startPoint.y - y,
+        };
+    },
+
+    dragEnded: // ...
+});</pre>
+
+
+<p>Eventually the drag operation completes and <em>dragEnded</em> is invoked. This calls into the view-model to apply the selection rect and then <a href="http://perfectionkills.com/understanding-delete/">deletes</a> the scope variables that were used to track the selection rectangle:</p>
+
+<pre>dragging.startDrag(evt, {
+    dragStarted: // ...
+
+    dragging: // ...
+
+    dragEnded: function () {
+        $scope.dragSelecting = false;
+        $scope.chart.applySelectionRect($scope.dragSelectionRect);
+        delete $scope.dragSelectionStartPoint;
+        delete $scope.dragSelectionRect;
+    },
+});</pre>
+
+
+<p>The selection rect itself is displayed as a simple <a href="https://developer.mozilla.org/en-US/docs/Web/SVG/Element/rect">SVG rect</a>:</p>
+
+<pre>&lt;rect
+    ng-if="dragSelecting"
+    class="drag-selection-rect"
+    ng-attr-x="{{dragSelectionRect.x}}"
+    ng-attr-y="{{dragSelectionRect.y}}"
+    ng-attr-width="{{dragSelectionRect.width}}"
+    ng-attr-height="{{dragSelectionRect.height}}"
+    &gt;
+&lt;/rect&gt;</pre>
+
+<p>The rect only needs to be shown when the user is actually dragging, so it is conditionally enabled using an <a href="http://docs.angularjs.org/api/ng.directive:ngIf"><em>ng-if</em></a> that is bound to the <em>dragSelecting</em> variable. If you look back at <em>dragStarted</em> and <em>dragEnded </em>you will see that this variable is set to <em>true</em> during the dragging operation.</p>
+
+
+
+<p>The rect is positioned by the <em>ng-attr-</em> atttributes that set its coordinates and size:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Selection-rect.png"></p>
+
+
+<h4>
+<a id="node-dragging" class="anchor" href="#node-dragging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Node Dragging</h4>
+
+<p>
+Nodes can be dragged by clicking anywhere on a node and dragging. Multiple selected nodes can be dragged at the same time.
+</p>
+
+<p><em>Mouse down</em> is handled for nodes and calls <em>nodeMouseDown</em>:</p>
+
+<pre>&lt;g
+    ng-repeat="node in chart.nodes"
+    ng-mousedown="nodeMouseDown($event, node)"
+    ng-attr-transform="translate({{node.x()}}, {{node.y()}})"
+    &gt;
+
+    &lt;! -- ... --&gt;
+&lt;/g&gt;</pre>
+
+<p><em>nodeMouseDown</em> uses the <em>dragging service</em> to coordinate the dragging of nodes:</p>
+
+<pre>$scope.nodeMouseDown = function (evt, node) {
+    // ...
+
+    dragging.startDrag(evt, {
+        dragStarted: // ...
+
+        dragging: // ...
+
+        clicked: // ...
+    });
+};</pre>
+
+<p>As we have already seen, a number of event handlers (or callbacks) are passed to s<em>tartDrag</em> which are invoked during the dragging operation. </p>
+
+<p><em>dragStarted</em> is invoked when dragging commences.</p>
+
+<pre>dragStarted: function (x, y) {
+
+    lastMouseCoords = controller.translateCoordinates(x, y);
+
+    if (!node.selected()) {
+        chart.deselectAll();
+        node.select();
+    }
+},</pre>    
+
+<p>When dragging a selected node <em>all selected</em>
+nodes are also dragged and the selection is not changed. However when
+dragging a node that is not already selected, only that node is
+selected and dragged.</p>
+
+<p><em>dragging</em> is invoked repeatedly during the dragging operation. It computes <em>delta mouse coordinates</em> and calls into the view-model to update the positions of the selected nodes.</p>
+
+<pre>dragging: function (x, y) {
+
+    var curCoords = controller.translateCoordinates(x, y);
+    var deltaX = curCoords.x - lastMouseCoords.x;
+    var deltaY = curCoords.y - lastMouseCoords.y;
+
+    chart.updateSelectedNodesLocation(deltaX, deltaY);
+
+    lastMouseCoords = curCoords;
+},</pre>
+
+<p><em>updateSelectedNodesLocation </em>is the view-model function that
+updates the positions of the nodes being dragged. It is trivial, simply
+enumerating selected nodes and directly updating their coordinates:</p>
+
+<pre>this.updateSelectedNodesLocation = function (deltaX, deltaY) {
+
+    var selectedNodes = this.getSelectedNodes();
+    for (var i = 0; i &lt; selectedNodes.length; ++i) {
+        var node = selectedNodes[i];
+        node.data.x += deltaX;
+        node.data.y += deltaY;
+    }
+};</pre>
+
+<p>There is no need to handle <em>dragEnded</em> in this circumstance, so it is omitted and ignored by the <em>dragging service</em>.
+
+</p><p>The <em>clicked</em> callback is new, it is invoked when the <em>mouse down </em>results in a click rather than a drag operation. In this case we delegate to the view-model:</p>
+
+<pre>clicked: function () {
+    chart.handleNodeClicked(node, evt.ctrlKey);
+},</pre>
+
+<p>
+<em>handleNodeClicked</em> either toggles the selection (when control is pressed) or deselects all and then only selects the clicked node:
+</p>
+
+<pre>this.handleNodeClicked = function (node, ctrlKey) {
+
+    if (ctrlKey) {
+        node.toggleSelected();
+    }
+    else {
+        this.deselectAll();
+        node.select();
+    }
+
+    var nodeIndex = this.nodes.indexOf(node);
+    if (nodeIndex == -1) {
+        throw new Error("Failed to find node in view model!");
+    }
+    this.nodes.splice(nodeIndex, 1);
+    this.nodes.push(node);          
+};</pre>
+
+<p>Notice the code at the end, it changes the order of nodes after each click. The node that was clicked is moved to the 
+end of the list. As the list of nodes drives an <em>ng-repeat</em>, as seen earlier, it actually controls the render order
+of the nodes. This is usually known as <a href="http://en.wikipedia.org/wiki/Z-order">Z order</a>. This means that clicked nodes are always <em>bought to the front</em>.</p>
+
+<h4>
+<a id="adding-nodes-and-connectors" class="anchor" href="#adding-nodes-and-connectors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding Nodes and Connectors</h4>
+
+
+<p>The UI for adding nodes to the flowchart is simple enough, I didn't spend much time on it. It is simply a button  
+    in <em>index.html</em>:</p>
+
+
+
+
+
+<pre>&lt;button
+    ng-click="addNewNode()"
+    title="Add a new node to the chart"
+    &gt;
+    Add Node
+&lt;/button&gt;</pre>
+
+
+<p>The <a href="http://docs.angularjs.org/api/ng.directive:ngClick">ng-click</a> binds the <em>click event</em> to the 
+    <em>addNewNode</em> function. Clicking the button calls this function that is defined in <em>app.js</em>:</p>
+
+
+<pre>$scope.addNewNode = function () {
+    var nodeName = prompt("Enter a node name:", "New node");
+
+    if (!nodeName) {
+        return;
+    }
+
+    var newNodeDataModel = {
+        // ... define node data-model ...
+    };
+
+    $scope.chartViewModel.addNode(newNodeDataModel);
+};</pre>
+
+<p>The function first prompts the user to enter a name for the new node. This makes use of the <em>prompt</em> <a href="http://docs.angularjs.org/guide/dev_guide.services.creating_services">service</a> which is defined in the same file and is an abstraction over the browser's <a href="http://www.w3schools.com/jsref/met_win_prompt.asp">prompt</a>
+function. Next the data-model for the new node is setup, this is pretty
+much the same as the chart's initial data-model. Finally <em>addNode</em> is called to inject the new node into the chart's view-model.</p>
+
+<p>Adding connectors is very similar to adding nodes. There are buttons
+for adding either an input or output connector. A function is
+called on button click, the user enters a name and a data-model is created before adding the connector
+to each selected node.</p>
+
+
+<h4>
+<a id="deleting-nodes-and-connections" class="anchor" href="#deleting-nodes-and-connections" aria-hidden="true"><span class="octicon octicon-link"></span></a>Deleting Nodes and Connections</h4>
+
+
+<p>Nodes and connections are deleted through the same mechanism. You
+select or multi-select what you want to delete then press the delete
+key or click the <em>Delete Selected</em> button. Clicking the button calls the deleteSelected function, which in turn calls through to the view-model:</p>
+
+
+
+
+<pre>$scope.deleteSelected = function () {
+    $scope.chartViewModel.deleteSelected();
+};</pre>
+
+
+<p>The delete key is handled for the <em>body</em> of the page using <a href="http://docs.angularjs.org/api/ng.directive:ngKeyup">ng-keyup</a>:</p>
+
+
+
+
+
+
+
+<pre>&lt;body 
+    ...
+    ng-keyup="keyUp($event)"
+    &gt;
+
+    &lt;!-- ... --&gt;
+&lt;/body&gt;</pre>
+
+
+<p><em>keyUp</em> is called whenever a key is pressed, it checks the keycode for the delete key and it calls through to the view-model:</p>
+
+
+
+
+
+
+
+
+
+
+
+<pre>$scope.keyUp = function (evt) {
+    if (evt.keyCode === deleteKeyCode) {
+        //
+        // Delete key.
+        //
+        $scope.chartViewModel.deleteSelected();
+    }
+
+    // ....
+};</pre>
+
+
+
+
+<p>This method of key event handling seems a bit ugly to me. I'm aware
+that AngularJS plugins exist to bind hotkeys directly to scope
+functions, but I didn't want to include any extra dependencies in this
+project. If anyone knows a cleaner way of setting this up in AngularJS
+please let me know and I'll update the article!</p>
+
+<p>When the view-model's <em>deleteSelected</em> is called it follows a
+few simple rules to determine which nodes and connectors to delete and
+which ones to keep, as illustrated in the following diagram:</p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Selected_items_to_be_deleted.png"></p>
+
+
+<p><em>deleteSelected</em> has three main parts:</p>
+
+<ol>
+<li>Enumerate nodes and remove any that are selected.</li>
+<li>Enumerate connections and remove any that are selected or any for which an attached node has already been removed.</li>
+<li>Update the view- and data-model to contain only the nodes and connections to be kept.</li>
+</ol>
+
+
+<p>The first part:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>this.deleteSelected = function () {
+    var newNodeViewModels = [];
+    var newNodeDataModels = [];
+    var deletedNodeIds = [];
+
+    for (var nodeIndex = 0; nodeIndex &lt; this.nodes.length; ++nodeIndex) {
+        var node = this.nodes[nodeIndex];
+
+        if (!node.selected()) {
+            // Only retain non-selected nodes.
+            newNodeViewModels.push(node);
+            newNodeDataModels.push(node.data);
+        }
+        else {
+            // Keep track of nodes that were deleted, so their connections can also
+            // be deleted.
+            deletedNodeIds.push(node.data.id);
+        }
+    }
+
+    // ...
+};</pre>
+
+<p>This code builds a new list that contains the nodes to be kept.
+Nodes that are not selected are added to this list. A separate list is
+built that contains the ids of nodes to be deleted. We hang onto the ids of deleted nodes in order to check
+which connections are now defunct because an attached node has been
+deleted.</p>
+
+
+<p>And the second part:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>this.deleteSelected = function () {
+    var newNodeViewModels = [];
+    var newNodeDataModels = [];
+    var deletedNodeIds = [];
+
+    // ... delete nodes ...
+
+    var newConnectionViewModels = [];
+    var newConnectionDataModels = [];
+
+    for (var connectionIndex = 0; connectionIndex &lt; this.connections.length; ++connectionIndex) {
+        var connection = this.connections[connectionIndex];               
+
+        if (!connection.selected() &amp;&amp;
+            deletedNodeIds.indexOf(connection.data.source.nodeID) === -1 &amp;&amp;
+            deletedNodeIds.indexOf(connection.data.dest.nodeID) === -1) {   
+            //
+            // The nodes this connection is attached to, where not deleted,
+            // so keep the connection.  
+            //
+            newConnectionViewModels.push(connection);
+            newConnectionDataModels.push(connection.data);
+        }
+    }
+
+    // ...
+};</pre>
+
+<p>The code for deleting connections is similar to that for deleting
+nodes. Again we build a list of connections to be kept. In this case we
+are deleting connections not only when they are selected, but also when
+the attached node was just deleted.</p>
+
+
+<p>The third part is the simplest, it updates the view-model and the data-model from the lists that were just built:</p>
+
+
+
+
+
+
+
+
+
+
+<pre>this.deleteSelected = function () {
+
+    // ... delete nodes ...
+
+    // ... delete connections ...
+
+    this.nodes = newNodeViewModels;
+    this.data.nodes = newNodeDataModels;
+    this.connections = newConnectionViewModels;
+    this.data.connections = newConnectionDataModels;
+};</pre>
+
+
+
+
+<h4>
+<a id="mouse-over-and-svg-hit-testing" class="anchor" href="#mouse-over-and-svg-hit-testing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Mouse Over and SVG Hit Testing</h4>
+<p>I have implemented <em>mouse over</em> support so that items in the
+flowchart can be highlighted when the mouse is hovered over them. It is
+interesting to look at this in more detail as I was unable to achieve
+it using AngularJS's event handling (eg <a href="http://docs.angularjs.org/api/ng.directive:ngMouseenter">ng-mouseenter</a> and <a href="http://docs.angularjs.org/api/ng.directive:ngMouseleave">ng-mouseleave</a>).  Instead I had to implement SVG <a href="http://en.wikipedia.org/wiki/Hit-testing">hit-test</a> manually in order to determine the element that is under the mouse cursor.</p>
+
+<p>The mouse-over feature isn't just cosmetic, it is necessary for
+connection dragging to know which connector a new connection is being
+dropped on.</p>
+
+<p>The root SVG element binds <a href="http://docs.angularjs.org/api/ng.directive:ngMousemove"><em>ng-mousemove</em></a>
+    to the <em>mouseMove</em> function: </p>
+
+
+
+
+
+
+
+<pre>&lt;svg
+    ...
+    ng-mousemove="mouseMove($event)" 
+    &gt;
+
+    &lt;!-- ... --&gt;
+&lt;/svg&gt; </pre>
+
+
+
+
+<p>This enables mouse movement tracking for the entire SVG canvas.</p>
+
+<p><em>mouseMove </em>first clears the <em>mouse over</em> elements that might have been cached in the previous invocation:</p>
+
+
+
+
+
+
+
+
+<pre>$scope.mouseMove = function (evt) {
+
+    $scope.mouseOverConnection = null;
+    $scope.mouseOverConnector = null;
+    $scope.mouseOverNode = null;
+
+    // ...
+};</pre>
+
+<p>Next is the actual hit-test:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>$scope.mouseMove = function (evt) {
+
+    // ... clear cached elements ...
+
+    var mouseOverElement = controller.hitTest(evt.clientX, evt.clientY);
+    if (mouseOverElement == null) {
+        // Mouse isn't over anything, just clear all.
+        return;
+    }
+
+    // ...
+};</pre>
+
+<p>Hit-testing is invoked after each mouse movement to determine the SVG element currently under the mouse cursor. When no
+SVG element is under the mouse, because nothing was hit, <em>mouseMove</em> returns straight away because it has nothing more to do. When this happens the
+cached elements have already been cleared so the current state of the
+controller records that <em>nothing was hit</em>.</p>
+
+<p>Next, various checks are made to determine what kind of element was
+clicked, so that the element (if it turns out to be a connection,
+connector or node) can be cached in the appropriate variable. Checking for <em>connection mouse over </em>is necessary only when connection dragging is not currently in progress. Therefore connection hit-testing must be conditionally enabled:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>$scope.mouseMove = function (evt) {
+
+    // ...
+
+    if (!$scope.draggingConnection) { // Only allow 'connection mouse over' when not dragging out a connection.
+
+        // Figure out if the mouse is over a connection.
+        var scope = controller.checkForHit(mouseOverElement, controller.connectionClass);
+        $scope.mouseOverConnection = (scope &amp;&amp; scope.connection) ? scope.connection : null;
+
+        if ($scope.mouseOverConnection) {
+            // Don't attempt to mouse over anything else.
+            return;
+        }
+    }
+
+    // ...
+};</pre>
+
+
+<p>After connection hit-testing is connector hit-testing, followed by node hit-testing:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>$scope.mouseMove = function (evt) {
+
+    // ...
+
+    // Figure out if the mouse is over a connector.
+    var scope = controller.checkForHit(mouseOverElement, controller.connectorClass);
+    $scope.mouseOverConnector = (scope &amp;&amp; scope.connector) ? scope.connector : null;
+    if ($scope.mouseOverConnector) {
+        // Don't attempt to mouse over anything else.
+        return;   
+    }
+
+    // Figure out if the mouse is over a node.
+    var scope = controller.checkForHit(mouseOverElement, controller.nodeClass);    
+    $scope.mouseOverNode = (scope &amp;&amp; scope.node) ? scope.node : null;       
+};</pre>
+
+
+<p>The <em>mouse over </em>element is cached in one of three variables: <em>mouseOverConnection</em>, <em>mouseOverConnector</em> or <em>mouseOverNode</em>. Each of these are scope variables and referenced from the SVG to conditionally enable a special class on <em>mouse over</em> to make the connection, connector or node look different when the mouse is hovered over it.</p>
+
+<p>ng-attr-class conditionally sets the class of the SVG
+element depending on the mouse-over state (and also the selection-state):</p>
+
+<pre>ng-attr-class="{{connection.selected() &amp;&amp; 'selected-connection-line' || (connection == mouseOverConnection &amp;&amp; 'mouseover-connection-line' || 'connection-line')}}"</pre>
+
+<p>This convoluted expression sets the class to <em>selected-</em>connection<em>-line</em> when the connection is selected, to <em>mouseover-connection-line </em>when the mouse is hovered over it or to <em>connection-line </em>when neither of these conditions is <em>true</em>.</p>
+
+<p><em>mouseMove</em> relies on the functions <em>hitTest</em> and <em>checkForHit</em> to do its dirty work.  <em>hitTest </em>simply calls <a href="https://developer.mozilla.org/en-US/docs/Web/API/document.elementFromPoint"><em>elementFromPoint</em></a> to determine the element under the specified coordinates:</p>
+
+
+
+
+<pre>this.hitTest = function (clientX, clientY) {
+    return this.document.elementFromPoint(clientX, clientY);
+};</pre>
+
+
+<p><em>checkForHit </em>invokes <em>searchUp</em> which recursively searches up the DOM for the element that has one of the following classes: <em>connection</em>, <em>connector</em> or <em>node</em>. In this way we can find the SVG element that relates most directly to the flowchart component we are hit-testing against.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>this.searchUp = function (element, parentClass) {
+    //
+    // Reached the root.
+    //
+    if (element == null || element.length == 0) {
+        return null;
+    }
+
+    // 
+    // Check if the element has the class that identifies it as a connector.
+    //
+    if (hasClassSVG(element, parentClass)) {
+        // 
+        // Found the connector element.
+        //
+        return element;
+    }
+
+    //
+    // Recursively search parent elements.
+    //
+    return this.searchUp(element.parent(), parentClass);
+};</pre>
+
+<p><em>searchUp </em>relies on the custom function <em>hasClassSVG</em> to check
+the class of the element. jQuery would normally be used to check the
+class of a HTML element, but unfortunately it doesn't work correctly
+for SVG elements. I discuss this more in <a href="#Problems_With_SVG">Problems with SVG</a>.
+
+</p><p>Both <em>hitTest </em>and <em>checkForHit</em> are implemented as separate functions so they are easily replaced with mocks in the unit-tests.</p>
+
+<h4>
+<a id="connection-dragging" class="anchor" href="#connection-dragging" aria-hidden="true"><span class="octicon octicon-link"></span></a>Connection Dragging</h4>
+
+
+<p>Connections are created by dragging out a connector, creating a
+connection that can be dragged about by the user. Creation of the new connection is completed when its end-point has
+been dragged over to another connector and it is committed to the view-model. When a connection is being dragged it is represented by an SVG
+visual that is separate to the other connections in the flowchart.</p>
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngIf"><em>ng-if</em></a> conditionally displays the visual when 
+    <em>draggingConnection</em> is set to <em>true</em>:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>&lt;g
+    ng-if="draggingConnection"
+    &gt;
+    &lt;path
+        class="dragging-connection dragging-connection-line"
+        ng-attr-d="M {{dragPoint1.x}}, {{dragPoint1.y}}
+                   C {{dragTangent1.x}}, {{dragTangent1.y}} 
+                     {{dragTangent2.x}}, {{dragTangent2.y}}
+                     {{dragPoint2.x}}, {{dragPoint2.y}}"
+        &gt;
+    &lt;/path&gt;
+
+    &lt;circle
+        class="dragging-connection dragging-connection-endpoint"
+        r="4"
+        ng-attr-cx="{{dragPoint1.x}}" 
+        ng-attr-cy="{{dragPoint1.y}}" 
+        &gt;
+    &lt;/circle&gt;
+
+    &lt;circle
+        class="dragging-connection dragging-connection-endpoint"
+        r="4" 
+        ng-attr-cx="{{dragPoint2.x}}" 
+        ng-attr-cy="{{dragPoint2.y}}"   
+        &gt;
+    &lt;/circle&gt;
+&lt;/g&gt;</pre>
+
+
+<p>The end-points and curve of the connection are defined by the following variables: <em>dragPoint1, dragPoint2, dragTangent1 </em>and <em>dragTangent2.</em></p>
+
+<p>Connection dragging is initiated by a <em>mouse down</em> on a <em>connector</em>. The mouse down event is bound to <em>connectorMouseDown</em>:</p>
+
+
+
+
+
+
+
+
+<pre>&lt;g
+    ng-repeat="connector in node.outputConnectors"
+    ng-mousedown="connectorMouseDown($event, node, connector, $index, false)"
+    class="connector output-connector"
+    &gt;
+
+    &lt;!-- ... connector ... --&gt;
+&lt;/g&gt;</pre>
+
+
+<p><em>connectorMouseDown</em> uses the <em>dragging service</em> to manage the dragging operation, something we now seen multiple times:</p>
+
+<pre>$scope.connectorMouseDown = function (evt, node, connector, connectorIndex, isInputConnector) {
+
+    dragging.startDrag(evt, {
+        // ... handle dragging events ...
+    });
+};</pre>
+
+
+<p>The end-points and tangents are computed when dragging commences:</p>
+
+<pre>dragStarted: function (x, y) {
+    var curCoords = controller.translateCoordinates(x, y);
+    $scope.draggingConnection = true;
+    $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+    $scope.dragPoint2 = {
+        x: curCoords.x,
+        y: curCoords.y
+    };
+    $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+    $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+},</pre>
+
+<p>d<em>raggingConnection</em> has been set to <em>true</em> enabling display of the SVG visual. </p>
+
+<p>The first end-point is anchored to the connector that was <em>dragged out</em>.
+The second end-point is anchored to the current position of the mouse cursor. </p>
+
+<p><img alt="" src="http://www.codeproject.com/KB/scripting/709340/Connection_dragging.png"></p>
+
+
+<p>The connection's end-points and tangents are updated repeatedly during dragging:</p>
+
+<pre>dragging: function (x, y, evt) {
+    var startCoords = controller.translateCoordinates(x, y);
+    $scope.dragPoint1 = flowchart.computeConnectorPos(node, connectorIndex, isInputConnector);
+    $scope.dragPoint2 = {
+        x: startCoords.x,
+        y: startCoords.y
+    };
+    $scope.dragTangent1 = flowchart.computeConnectionSourceTangent($scope.dragPoint1, $scope.dragPoint2);
+    $scope.dragTangent2 = flowchart.computeConnectionDestTangent($scope.dragPoint1, $scope.dragPoint2);
+},</pre>
+
+
+
+<p>Upon completion of the drag operation the new connection is committed to the flowchart:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>dragEnded: function () {
+    if ($scope.mouseOverConnector &amp;&amp; 
+        $scope.mouseOverConnector !== connector) {
+        $scope.chart.createNewConnection(connector, $scope.mouseOverConnector);
+    }
+
+    $scope.draggingConnection = false;
+    delete $scope.dragPoint1;
+    delete $scope.dragTangent1;
+    delete $scope.dragPoint2;
+    delete $scope.dragTangent2;
+},</pre>
+
+<p>The scope variables that are no longer needed are <a href="http://perfectionkills.com/understanding-delete/">deleted</a>. <em>draggingConnection </em>is then set to <em>false</em> to disable rendering of the <em>dragging connection</em> visual.</p>
+
+<p>Note the single validation rule: <em>A connection cannot be created that loops back to the same connector</em>. If this were production code it would likely have more validation rules or some way of adding user-defined rules.</p>
+
+<p>If you are interested in the call to <em>translateCoordinates</em>, I'll explain that in <a href="#Problems_with_SVG">Problems with SVG</a>.</p>
+
+
+
+<h4>
+<a id="dragging-service" class="anchor" href="#dragging-service" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Dragging_Service">Dragging Service</a>
+</h4>
+
+
+<p>The flowchart relies on good handling of mouse input, so it was
+really important to get that right. It is only the flowchart directive
+that talks to the <em>dragging service,</em> the view-model has no knowledge of it. The <em>dragging service</em> in turn depends on the <a href="#Mouse_Capture_Service"><em>mouse capture service</em></a>.</p>
+
+
+
+<p>Dragging is necessary in many different applications and it is
+surprisingly tricky to get right. Dragging code directly embedded
+in UI code complicates things because you generally
+have to manage the dragging operation as some kind of <em>state machine</em>.
+This can become more painful as different types of dragging
+operations are required and
+complexity grows.There are Javascript libraries and plugins that already
+do this kind of thing, however I wanted to make something
+that worked well with HTML, SVG and AngularJS.  </p>
+
+<p>The flowchart directive makes use of the dragging directive in the
+following ways and we have already examined how these work:</p>
+
+
+<ul>
+<li>Drag selection;</li>
+<li>Node dragging; and</li>
+<li>Connection dragging</li>
+</ul>
+
+
+
+<p>You can start to imagine, if the dragging wasn't in a
+separate reusable library, how the flowchart directive
+(though relatively simple) could get very complicated, having all
+three dragging
+operations handled directly. <a href="http://c2.com/cgi/wiki?EventDrivenProgramming">Event driven programming</a>
+comes to our rescue and Javascript has particular good support for this
+with its anonymous functions that we use to define inline callbacks for
+events.</p>
+
+<p><em>startDrag</em> must be called to initate the dragging operation. This is intended to be called in response to a <em>mouse down</em> event.<em> </em>Anonymous functions to handle the dragging events are passed as parameters:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>dragging.startDrag(evt, {
+    dragStarted: function (x, y) {
+        // ... event handler ...
+    },
+
+    dragging: function (x, y, evt) {
+        // ... event handler ...
+    },
+
+    dragEnded: function () {
+        // ... event handler ...
+    },
+
+    clicked: function () {
+        // ... event handler ...
+    },
+});</pre>
+
+
+
+
+<p><em>dragStarted</em>, <em>dragging</em> and <em>dragEnded</em> are invoked for key events during the dragging operation. <em>clicked</em> is invoked when a <em>mouse down </em>is followed by a <em>mouse up </em>but
+no dragging has occurred (or
+at least the mouse has not moved beyond a small threshold). This is considered to be
+a <em>mouse click</em> rather than a <em>mouse drag</em>.</p>
+
+
+
+<p>The implementation of the service is in <em>dragging_service.js</em>. An <a href="http://docs.angularjs.org/guide/module">AngularJS module</a> is defined at the start:</p>
+
+<pre>angular.module('dragging', ['mouseCapture', ] )</pre>
+
+
+
+
+<p>The <em>dragging </em>module depends on the <em>mouseCapture</em> module. The rest of the file contains the definition of the <a href="http://docs.angularjs.org/guide/dev_guide.services.understanding_services">service</a>:</p>
+
+
+
+
+
+
+
+
+
+<pre>.factory('dragging', function ($rootScope, mouseCapture) {
+
+    // ...
+
+    return {
+        // ... functions exported by the service ...
+    };
+})
+;</pre>
+
+<p>The object returned by the factory function is the actual service. The service is registered under the name <em>dragging</em> so that AngularJS can instantiate the service when it needs to be dependency injected into the <em>FlowChartController</em> as the <em>dragging </em>parameter.</p>
+
+<p>The service exports the single function <em>startDrag </em>which we have already used several times:</p>
+
+
+
+
+
+<pre>return {
+    startDrag: function (evt, config) {
+        // ...
+    },
+};</pre>
+
+
+
+<p>The parameters to <em>startDrag </em>are the event object for the <em>mouse down </em>event and a configuration object containing the event handlers. <em>startDrag </em><a href="http://stackoverflow.com/questions/942357/what-does-it-mean-to-capture-the-mouse-in-wpf"><em>captures the mouse</em></a><em> </em>for the duration of the dragging operation. The nested functions handle <em>mouse events </em>during the capture so that it may monitor the state of the mouse:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>startDrag: function (evt, config) {
+    var dragging = false;
+    var x = evt.pageX;
+    var y = evt.pageY;
+
+    var mouseMove = function (evt) {
+        // ... handle mouse move events during dragging ...
+    };
+
+    var released = function() {
+        // ... handle release of mouse capture and end dragging ...
+    };
+
+    var mouseUp = function (evt) {
+        // ... handle mouse up and release the mouse capture ...
+    };
+
+    mouseCapture.acquire(evt, {
+        mouseMove: mouseMove,
+        mouseUp: mouseUp,
+        released: released,\
+    });
+
+    evt.stopPropagation();
+    evt.preventDefault();
+},</pre>
+
+
+<p>Calling <em>mouseCapture.acquire </em>captures the mouse and the
+service subsequently handles mouse input events. This allows the
+dragging operation to be initiated for a sub-element of the page (via a
+<em>mouse down</em> on that element) with dragging then handled by events on a parent element (in this case the <em>body</em> element). In Windows programming <em>mouse capture</em>
+is supported by the operating system. When working within the browser
+however this must be implemented manually, so I created a custom <em>mouse capture</em> service which is discussed in the <a href="#Mouse_Capture_Service">next section</a>. </p>
+
+<p>Note that <em>startDrag</em> stops propagation of the DOM event and
+prevents the default action, the dragging service provides
+custom input handling so we prevent the browser's default action.</p>
+
+
+
+<p>Let's look at the mouse event handlers that are active during dragging. The <em>mouse move</em> handler has two personalities. Before dragging
+has started it continuously checks the mouse coordinates to see if they
+move beyond a small threshold. When that happens the dragging operation
+commences and <em>dragStarted</em> is called.</p>
+
+<p>From then on dragging is in progress and the mouseMove continuously tracks the coordinates of the mouse and repeatedly
+calls the <em>dragging</em> function.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>var mouseMove = function (evt) {
+    if (!dragging) {
+        if (evt.pageX - x &gt; threshold ||
+            evt.pageY - y &gt; threshold) {
+            dragging = true;
+
+            if (config.dragStarted) {
+                config.dragStarted(x, y, evt);
+            }
+
+            if (config.dragging) {
+                // First 'dragging' call to take into account that we have 
+                // already moved the mouse by a 'threshold' amount.
+                config.dragging(evt.pageX, evt.pageY, evt);
+            }
+        }
+    }
+    else {    
+        if (config.dragging) {
+            config.dragging(evt.pageX, evt.pageY, evt);
+        }
+
+        x = evt.pageX;
+        y = evt.pageY;
+    }
+};</pre>
+
+
+<p>The <em>release </em>handler is called when mouse capture has been released.  This can happen in one of two ways. The <em>mouse up</em>
+handler has stopped the dragging operation and requested that the mouse
+be released. Alternatively if some other code has acquired the mouse capture
+which forces a release. <em>release </em>also has two personalities, if dragging was in progress it invokes <em>dragEnded</em>.  If dragging never commenced, because the mouse never moved beyond the threshold, <em>clicked </em>is instead invoked to indicate that dragging never started and the user simply <em>mouse-clicked</em>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>var released = function() {
+    if (dragging) {
+        if (config.dragEnded) {
+            config.dragEnded();
+        }
+    }
+    else {
+        if (config.clicked) { 
+            config.clicked();
+        }
+    }
+};</pre>
+
+
+<p>The <em>mouse up</em> handler is simple<em>, </em>it just releases the mouse capture (which invokes the <em>release</em> handler) and stops propagation of the event.</p>
+
+
+
+
+
+
+
+<pre>var mouseUp = function (evt) {
+    mouseCapture.release();
+    evt.stopPropagation();
+    evt.preventDefault();
+};</pre>
+
+
+
+
+<h4>
+<a id="mouse-capture-service" class="anchor" href="#mouse-capture-service" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Mouse_Capture_Service">Mouse Capture Service</a>
+</h4>
+
+<p><a href="http://stackoverflow.com/questions/942357/what-does-it-mean-to-capture-the-mouse-in-wpf">Mouse capture</a>
+is used as a matter of course when developing a Windows
+application. When <em>mouse capture</em> is <em>acquired</em> we are able to specially handle the mouse events for an element until
+the capture is <em>released</em>. When working in the browser there appears to be no
+built-in way to achieve this. Using an <a href="http://docs.angularjs.org/guide/directive"><em>AngularJS directive</em></a><em> </em>and a <a href="http://docs.angularjs.org/guide/dev_guide.services.understanding_services"><em>service</em></a> I was able to create my own custom attribute that attaches this behavior to the DOM.</p>
+
+<p>The <em>mouse-capture</em> attribute identifies the element that can <em>capture the mouse</em>. In the flowchart application mouse-capture is applied to the body of the HTML page:</p>
+
+
+
+
+
+
+
+
+
+<pre>&lt;body
+    ng-app="app"
+    ng-controller="AppCtrl"
+    mouse-capture
+    ng-keydown="keyDown($event)"
+    ng-keyup="keyUp($event)"
+    &gt;
+
+    &lt;!-- ... --&gt;
+&lt;/body&gt;</pre>
+
+
+<p>The small directive that implements this attribute is at the end of <em>mouse_capture_directive.js</em>. The rest of the file implements the service that is used to <em>acquire the mouse capture</em>.</p>
+
+<p>The file starts by registering the module:</p>
+
+<pre>angular.module('mouseCapture', [])</pre>
+
+
+
+<p>This module has no dependencies, hence the empty array. </p>
+
+<p>Next the service is registered:</p>
+
+
+
+
+
+
+
+
+<pre>.factory('mouseCapture', function ($rootScope) {
+
+    // ... setup and event handlers ...
+
+    return {
+        // ... functions exported by the service ...
+    };
+})</pre>
+
+
+
+<p>This is quite a big one and we'll come back to it in a moment. At
+the end of the file is a directive with the same name as the service:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>.directive('mouseCapture', function () {
+    return {
+        restrict: 'A',
+        controller: function($scope, $element, $attrs, mouseCapture) {
+            mouseCapture.registerElement($element);
+        },
+    };
+})
+;</pre>
+
+<p>Both the service and the directive can have the same name
+because they are used in different contexts. The service is dependency
+injected into Javascript functions and the directive is used as a HTML
+attribute (hence the <em>restrict: 'A'</em>), so their usage does not overlap.</p>
+
+<p>The directive defines a controller that it is initialized when the DOM is loaded.  The <em>mouseCapture </em>service
+itself is injected into the controller along with the DOM element. The
+directive uses the service to register the element for <em>mouse capture</em>, this is the element for which <em>mouse move</em> and <em>mouse up</em> will be handled during the capture.</p>
+
+<p>Going back to the service. The factory function defines several mouse event handlers before returning the service:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>.factory('mouseCapture', function ($rootScope) {
+
+    // ... state variables ...
+
+    var mouseMove = function (evt) {        
+        // ... handle mouse movement while the mouse is captured ...
+    };
+
+    var mouseUp = function (evt) {
+        // ... handle mouse up while the mouse is capture ...
+    };
+
+    return {
+        // ... functions exported by the service ...
+    };
+})</pre>
+
+
+
+<p>The handlers are dynamically attached to the DOM when
+mouse capture is acquired and detached when mouse capture is
+released. </p>
+
+<p>The service itself exports three functions:</p>
+
+<pre>return {
+    registerElement: function(element) {
+        // ... register the DOM element whose mouse events will be hooked ...
+    },
+
+    acquire: function (evt, config) {
+        // ... acquires the mouse capture ...
+    },
+
+    release: function () {  
+        // ... releases the mouse capture ...
+    },
+};</pre>
+
+<p><em>registerElement</em> is simple, it caches the single element whose mouse events can be captured (in this case the <em>body </em>element).</p>
+
+<pre>registerElement: function(element) {
+    $element = element;
+},</pre>
+
+<p><em>acquire</em> releases any previous mouse capture, caches the configuration object and binds the event handlers:</p>
+
+
+
+
+
+
+
+
+<pre>acquire: function (evt, config) {
+    this.release();
+    mouseCaptureConfig = config;
+    $element.mousemove(mouseMove);
+    $element.mouseup(mouseUp);
+},</pre>
+
+<p><em>release</em> invokes the <em>released </em>event handler and unbinds the event handlers:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<pre>release: function () {
+    if (mouseCaptureConfig) {
+        if (mouseCaptureConfig.released) {
+            mouseCaptureConfig.released();
+        }
+
+        mouseCaptureConfig = null;
+    }
+
+    $element.unbind("mousemove", mouseMove);
+    $element.unbind("mouseup", mouseUp);
+},</pre>
+
+
+<p>While the mouse is captured <em>mouseMove</em> and <em>mouseUp</em> are invoked to handle mouse events, the events are relayed to higher-level code (such as the <em>dragging service</em>).</p>
+
+<p><em>mouseMove</em> are <em>mouseUp</em> are pretty similar, so let's just look at mouseMove:</p>
+
+
+
+
+
+
+
+
+<pre>var mouseMove = function (evt) {
+    if (mouseCaptureConfig &amp;&amp; mouseCaptureConfig.mouseMove) {
+        mouseCaptureConfig.mouseMove(evt);
+        $rootScope.$digest();
+    }
+};</pre>
+
+<p>The <a href="http://docs.angularjs.org/api/ng.%24rootScope.Scope#methods_%24digest"><em>$digest</em></a><em> </em>function must be called to make AngularJS aware of data-model changes made by clients of the <em>mouse capture </em>service. AngularJS needs to know when the data-model has changed so that it can 
+re-render the DOM as necessary. Most of the time when writing an AngularJS
+application you don't need to know about $digest,
+it only comes into play when you are working at a low-level in a
+directive or a service and usually working directly with the DOM.</p>
+
+<h2>
+<a id="problems" class="anchor" href="#problems" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems</h2>
+
+<h3>
+<a id="problems-with-web-ui" class="anchor" href="#problems-with-web-ui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems with Web UI</h3>
+
+<p>Client-side web development is fraught with problems and this is obvious to anyone who has been engaged in it. 
+Using
+libraries such as jQuery and frameworks like AngularJS goes a long way
+to avoiding problems. Using Javascript appropriately (thanks Mr
+Crockford!) and having your code scaffolded by unit-tests goes even
+further to avoiding traditional issues. Good software development
+skills and an understanding of appropriate patterns help tremendously
+to avoid the Javascript maintenance and debugging nightmares of the
+past.</p>
+
+<p>Even with all the problems associated with client-side web
+development I think I actually prefer it to regular application
+development. As a professional software developer I do a bit of both,
+but if possible in the future I may consider developing desktop
+applications as stand-alone web applications. The productivity boost
+associated with not having to use a compiler (unless you want to) and
+also the possibilities that arise from having a skinable application
+can't be overlooked, although I do miss Visual Studio's refactoring support.</p>
+
+<p>One thing I really missed from Windows desktop programming was being able to <em>capture the mouse </em>and to achieve this I had create my own DIY mouse capture system.</p><h3>
+<a id="problems-with-angularjs" class="anchor" href="#problems-with-angularjs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems with AngularJS</h3>
+<p>Although I had a few issues with AngularJS, I want to be completely
+clear: AngularJS is awesome. It makes client-side web development so
+much easier to the point where it has pretty much convinced me that
+this is the better way to make UIs over and above WPF.</p>
+
+<p>Since I first started this project AngularJS has evolved. Support for <em>ng-attr-</em>
+was added recently and appears be specifically to solve problems with
+data-binding attributes on SVG elements, exactly the problem I was
+having! This feature was so new and so necessary that originally I had
+to clone direct from the AngularJS repository to get early access to
+it. It is still so new that the only documentation they appear to have
+is part of the <a href="http://docs.angularjs.org/guide/directive">help for directives</a>.</p>
+
+<p><a href="http://docs.angularjs.org/api/ng.directive:ngIf"><em>ng-if</em></a>
+was another feature that came along during this project and being able
+to conditionally display HTML/SVG elements turned out to be very useful.</p>
+
+<p>The learning curve was steep. This wasn't just AngularJS but
+leveling up my web development skills took considerable effort. All
+told though, there were very few problems with AngularJS and the amount
+of problems that it solves genuinely out-weighted its learning curve or
+any problems I had using it.</p>
+
+
+<h3>
+<a id="problems-with-svg" class="anchor" href="#problems-with-svg" aria-hidden="true"><span class="octicon octicon-link"></span></a>Problems with SVG</h3>
+
+<p>When I first started integrating AngularJS/jQuery and SVG I hit
+many small problems. To help figure out what I could and couldn't do,
+I made a massive test-bed that tested many different aspects of the
+integration. This allowed me to figure out the problem areas that I
+wanted to avoid, and find solutions for the areas that I couldn't avoid.
+</p>
+
+<p>Creating the test-bed allowed me to work through the issues and improve my
+understanding of SVG and how it interacts with AngularJS features such
+as <em>ng-repeat</em>. I discovered that it was very difficult to create
+directives that inject SVG elements underneath the root SVG element.
+This appears to be due to jQuery creating elements in the HTML
+namespace rather than the SVG namespace. AngularJS uses jQuery under
+the hood so instantiating portions of SVG templates causes the elements
+not to be SVG elements at all, which clearly doesn't help. This is a
+well known problem when creating SVG elements with jQuery (if you guys
+are listening, please just fix it!) and there is a fair amount of
+information out there that will show you the hoops to jump through as a
+workaround. In the flowchart application though I was able to avoid the
+namespace problem completely by containing all my SVG under the one
+single template with the namespace explicitly specified in the SVG
+element.</p>
+
+<p>
+Unfortunately the SVG DOM is different to the HTML DOM and so many jQuery functions that you might expect to work don't (although some do work fine). A notable example is with setting the class of an element. As this doesn't work for SVG when using jQuery, it doesn't work for AngularJS either, which builds on jQuery. So <a href="http://docs.angularjs.org/api/ng.directive:ngClass">ng-class</a> can't be used. This is why I have been forced to use <em>ng-attr-class</em> multiple times in the SVG for conditionally setting the class. This isn't such a bad option anyway as I think <em>ng-attr-class</em> is easier to understand than the alternatives, even though it does have the limitation of only being able to apply a single class to an
+element at a time. In other cases (eg, the <a href="#Mouse_Over_and_SVG_Hit_Testing">mouse over</a> code)
+I have worked around the class problem by avoiding jQuery and using custom functions for checking SVG class. Thanks to Justin McCandless for sharing <a href="http://www.justinmccandless.com/blog/Patching+jQuery%27s+Lack+of+SVG+Support">his solution</a> to this problem.</p>
+
+<p>There are existing libraries that help deal with jQuery's bad SVG support. The jQuery SVG plugin looks good, but only if you want to create and manipulate SVG programatically. I was keen to define the SVG declaratively using an AngularJS template.</p>
+
+<p>By implementing my own code for hit testing and mouse-over, I avoided potential problems with jQuery's mouseenter/mouseleave events relating to SVG. For this using the extremely simple function <a href="https://developer.mozilla.org/en-US/docs/Web/API/document.elementFromPoint"><em>elementFromPoint</em></a> seemed like the most convenient option.
+</p>
+
+<p>Another jQuery problem I had was with the <em>offset</em> function.
+Originally I was using this to translate page coordinates into SVG
+coordinates. For some reason this didn't work properly under <em>Firefox</em>. After <a href="http://forums.mozillazine.org/viewtopic.php?f=25&amp;t=1930181">research online</a> I created the <em>translateCoordinates</em> function that uses the SVG API to achieve the translation.</p>
+
+<p>Another issue under Firefox was that the <em>fill </em>property for an <em>SVG rect</em> cannot be set using CSS. This worked in other browsers, but under Firefox I had to change it so <em>fill</em> had to be set as an attribute of the <em>rect</em> rather than via CSS.</p>
+
+<p>I had one other problem that is worth mentioning. It was very odd and I never completely figured it out. I had nested <em>SVG g</em> elements representing a connection with <em>ng-repeat </em>applied
+to it to render multiple connections (that is a <em>g</em> nested within another
+<em>g</em>). When there were no connections (resulting in the <em>ng-repeat</em> displaying nothing) every SVG element after the connections was blown away. Just gone! The nested <em>g</em> element was actually redundant so I was able to cut it down to a single <em>g</em>
+containing the visuals for a connection. That fixed this very unusual
+problem. I tested out the problem under HTML instead of SVG and didn't
+get the issue, so I assume that it only manifests when using SVG under
+AngularJS (or possibly something to do with jQuery).</p>
+
+<h2>
+<a id="conclusion" class="anchor" href="#conclusion" aria-hidden="true"><span class="octicon octicon-link"></span></a><a name="Conclusion">Conclusion</a>
+</h2>
+
+<p>This is the end of the article.  Thanks for taking the time to read it. </p><p>Any
+feedback or bug reports you give will be greatly appreciated and I'll
+endeavor to update the article and code as appropriate.  I'll
+leave you with some ideas for the future and links to useful resources.</p>
+
+<p></p><h3>
+<a id="future-improvements" class="anchor" href="#future-improvements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Future Improvements</h3>
+
+<p>The future improvements that could be applied to this code are simply the features that were in NetworkView from the <a href="http://www.codeproject.com/Articles/182683/NetworkView-A-WPF-custom-control-for-visualizing-a">original article</a>: </p>
+
+<ul>
+<li>Templating to support different kind of nodes</li>
+<li>Adorners for feedback</li>
+<li>Zooming and panning</li>
+</ul>
+
+<h3>
+<a id="resources" class="anchor" href="#resources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Resources</h3>
+
+<p>AngularJS:</p>
+
+<p><a href="http://angularjs.org/">http://angularjs.org/</a></p>
+
+<p><a href="http://docs.angularjs.org/api">http://docs.angularjs.org/api</a></p>
+
+<p>jQuery:</p>
+
+<p><a href="http://jquery.com/">http://jquery.com/</a></p>
+
+<p>SVG:</p>
+
+<p><a href="http://www.w3schools.com/svg/">http://www.w3schools.com/svg/</a></p>
+
+<p>Jasmine:</p>
+
+<p><a href="http://pivotal.github.io/jasmine/">http://pivotal.github.io/jasmine/</a></p><p>Test Driven Development:</p><a href="http://net.tutsplus.com/tutorials/php/the-newbies-guide-to-test-driven-development/">http://net.tutsplus.com/tutorials/php/the-newbies-guide-to-test-driven-development/</a><p><a href="http://pivotal.github.io/jasmine/"></a></p>
+
+<pre><code>                    &lt;/div&gt;
+
+
+                    &lt;div class="float-right" style="margin:20px 0 0 10px;border:1px solid #ccc"&gt;
+
+                    &lt;/div&gt;
+</code></pre>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/muddy-28/concept-map-flow-builder/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/muddy-28/concept-map-flow-builder/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/muddy-28/concept-map-flow-builder"></a> is maintained by <a href="https://github.com/muddy-28">muddy-28</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
