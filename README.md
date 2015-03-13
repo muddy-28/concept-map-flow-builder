@@ -37,61 +37,21 @@ In your application (or other) controller setup a data-model for the initial flo
 
 		nodes: [
 			{
-				name: "Example Node 1",
+				name: "Node 1",
 				id: 0,
 				x: 0,
 				y: 0,
-				inputConnectors: [
-					{
-						name: "A",
-					},
-					{
-						name: "B",
-					},
-					{
-						name: "C",
-					},
-				],
-				outputConnectors: [
-					{
-						name: "A",
-					},
-					{
-						name: "B",
-					},
-					{
-						name: "C",
-					},
-				],
+				inputConnectors: [	],
+				outputConnectors: [	],
 			},
 
 			{
-				name: "Example Node 2",
+				name: "Node 2",
 				id: 1,
 				x: 400,
 				y: 200,
-				inputConnectors: [
-					{
-						name: "A",
-					},
-					{
-						name: "B",
-					},
-					{
-						name: "C",
-					},
-				],
-				outputConnectors: [
-					{
-						name: "A",
-					},
-					{
-						name: "B",
-					},
-					{
-						name: "C",
-					},
-				],
+				inputConnectors: [ ],
+				outputConnectors: [	],
 			},
 
 		],
