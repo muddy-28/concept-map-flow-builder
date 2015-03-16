@@ -202,27 +202,9 @@ angular.module('app', ['flowChart', ])
 			x: 0,
 			y: 0,
 			inputConnectors: [
-				{
-					name: "X"
-				},
-				{
-					name: "Y"
-				},
-				{
-					name: "Z"
-				}
 			],
 			outputConnectors: [ 
-				{
-					name: "1"
-				},
-				{
-					name: "2"
-				},
-				{
-					name: "3"
-				}
-			],
+							],
 		};
 
 		$scope.chartViewModel.addNode(newNodeDataModel);
