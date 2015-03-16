@@ -8,7 +8,7 @@ This isn't designed to be completely general purpose, but it will be a good basi
 Project Article
 --------------------
 
-http://muddy-28.github.io/AngularJS-FlowChart/
+http://muddy-28.github.io/concept-map-flow-builder/
 
 
 How to use it
