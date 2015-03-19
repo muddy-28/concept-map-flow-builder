@@ -119,7 +119,7 @@ angular.module('app', ['flowChart', ])
 	//
 	$scope.addNewNode = function () {
 
-		var nodeName = prompt("Enter a node name:", "New mad node");
+		var nodeName = prompt("Enter a node name:", "New Node");
 		if (!nodeName) {
 			return;
 		}
@@ -132,10 +132,8 @@ angular.module('app', ['flowChart', ])
 			id: nextNodeID++,
 			x: 0,
 			y: 0,
-			inputConnectors: [
-			],
-			outputConnectors: [ 
-							],
+			inputConnectors: [ ],
+			outputConnectors: [ ],
 		};
 
 		$scope.chartViewModel.addNode(newNodeDataModel);

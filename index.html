@@ -18,43 +18,45 @@
 		>
 
 		<div style="width: 100%; overflow: hidden;">
-		    <div style="width: 200px; float: left;"> 
-				<textarea 
-					style="width: 100%; height: 100%;"
-					chart-json-edit
-					view-model="chartViewModel"
-					>
-				</textarea>
-			</div>
-		    <div style="margin-left: 400px;">
-    			<button
+		    <div style="width: 150px; float: left;"><br><br>
+                <button
     				ng-click="addNewNode()"
     				title="Add a new node to the chart"
     				>
     				Add Node
-				</button>
+				</button><br><br>
     			<button
     				ng-click="addNewInputConnector()"
     				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
     				title="Add a new input connector to the selected node"
     				>
     				Add Input Connector
-				</button>
+				</button><br><br>
     			<button
     				ng-click="addNewOutputConnector()"
     				ng-disabled="chartViewModel.getSelectedNodes().length == 0"
     				title="Add a new output connector to the selected node"
     				>
     				Add Output Connector
-				</button>
+				</button><br><br>
     			<button
     				ng-click="deleteSelected()"
     				ng-disabled="chartViewModel.getSelectedNodes().length == 0 && chartViewModel.getSelectedConnections().length == 0"
     				title="Delete selected nodes and connections"
     				>
     				Delete Selected
-				</button>
+				</button><br><br>
 
+                <form action="process.php" method="POST">
+				<textarea name="json_obj" hidden="true" style="width: 100%; height: 100%;" chart-json-edit view-model="chartViewModel">
+				</textarea>
+                    
+                    <button type="submit">Save ConceptMap</button>
+                    </form>
+                
+			</div>
+		    <div style="margin-left: 400px;">
+    			
 				<!--
 				This custom element defines the flowchart.
 				-->
