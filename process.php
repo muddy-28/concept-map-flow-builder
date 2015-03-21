@@ -25,11 +25,11 @@ if ($conn->query($sql) === TRUE) {
     echo "<br>Error: " . $sql . "<br>" . $conn->error;
 }
 $conn->close();
-$id=$map['nodes'];
-for($id as $id)
-{
-   echo $id['nodes']." ".$id['name'];
-}
-
-$status=$data['nodes'];
+//$id=$map['nodes'];
+//for($id as $id)
+//{
+//   echo $id['nodes']." ".$id['name'];
+//}
+//
+//$status=$data['nodes'];
 ?>
