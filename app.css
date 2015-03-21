@@ -14,6 +14,21 @@ Generic reset.
 	font-family: "Times New Roman";
 	font-style: italic;
 }
+body {
+	width:auto
+	margin:45px auto;
+	background-color:#D9D9D9;
+    font-family: 'Ubuntu Mono';
+    
+	}
+
+button{
+	width:150px; 
+	height:40px; 
+	color:#4C4C4C; 
+	margin-bottom:20px; 
+	margin-left:20px;
+	}
 
 /*
 Styles for nodes and connectors.
