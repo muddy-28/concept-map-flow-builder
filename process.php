@@ -26,9 +26,6 @@ if ($conn->query($sql) === TRUE) {
 } else {
     echo "<br>Error: " . $sql . "<br>" . $conn->error;
 }
-/*
-{ "nodes": [ { "name": "fgh", "id": 10, "x": 348, "y": 42, "inputConnectors": [ { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" } ], "outputConnectors": [], "width": 250 }, { "name": "New Node", "id": 11, "x": 33, "y": 280.99999618530273, "inputConnectors": [], "outputConnectors": [ { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" } ], "width": 250 } ], "connections": [ { "source": { "nodeID": 11, "connectorIndex": 3 }, "dest": { "nodeID": 10, "connectorIndex": 2 } } ] }
-*/
 
 $conn->close();
 $map_decod=json_decode($map,true);
@@ -46,7 +43,7 @@ $count_i_conn=count($i_conn);
 //echo $count_i_conn;
 for($i_conn_count=0;$i_conn_count<$count_i_conn;$i_conn_count++)
 {
-    echo "in connector 1-".$i_conn[$i_conn_count]['name']."<br>";
+    echo "in connector".$i_conn_count.":_".$i_conn[$i_conn_count]['name']."<br>";
 }
 //output connectors    
 $o_conn=$nodes[$nodes_count]['outputConnectors'];
@@ -54,7 +51,7 @@ $count_o_conn=count($o_conn);
 //echo $count_o_conn;
 for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
 {
-    echo "out connector1-".$i_conn[$o_conn_count]['name']."<br><br>";
+    echo "out connector-".$i_conn_count.":_".$i_conn[$o_conn_count]['name']."<br><br>";
 }
 
 }
