@@ -18,13 +18,13 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql = "INSERT INTO `concept-map-builder`.`concept-maps` (`map_id`, `map_data`, `map_created_by`, `created_on`) 
+$sql_map = "INSERT INTO `concept-map-builder`.`concept-maps` (`map_id`, `map_data`, `map_created_by`, `created_on`) 
 VALUES (NULL, '$map', 'Adnan Shafique', CURRENT_TIMESTAMP)";
 
-if ($conn->query($sql) === TRUE) {
+if ($conn->query($sql_map) === TRUE) {
     echo "<br><h4>New record created successfully</h4>";
 } else {
-    echo "<br>Error: " . $sql . "<br>" . $conn->error;
+    echo "<br>Error: " . $sql_map . "<br>" . $conn->error;
 }
 
 $conn->close();
@@ -52,6 +52,7 @@ $count_o_conn=count($o_conn);
 //echo $count_o_conn;
 for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
 {
+    echo "out connector-".$o_conn_count.":_".$i_conn[$o_conn_count]['name']."<br>";
 }
 
 }
