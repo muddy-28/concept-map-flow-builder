@@ -36,35 +36,35 @@ for($nodes_count=0;$nodes_count<$count_nodes;$nodes_count++)
 {
 echo "<br>NAME:-".$nodes[$nodes_count]['name']."<br>";
 echo "ID:-".$nodes[$nodes_count]['id']."<br>";
-
-//input connectors    
+//$sql_slct_max="SELECT MAX(map_id) FROM concept-maps";
+    
+//--------------input connectors--------------    
 $i_conn=$nodes[$nodes_count]['inputConnectors'];
 $count_i_conn=count($i_conn);
-//echo $count_i_conn;
+
 for($i_conn_count=0;$i_conn_count<$count_i_conn;$i_conn_count++)
 {
     echo "in connector".$i_conn_count.":_".$i_conn[$i_conn_count]['name']."<br>";
 }
-//output connectors    
+//--------------output connectors--------------    
 $o_conn=$nodes[$nodes_count]['outputConnectors'];
 $count_o_conn=count($o_conn);
 //echo $count_o_conn;
 for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
 {
-    echo "out connector-".$i_conn_count.":_".$i_conn[$o_conn_count]['name']."<br><br>";
 }
 
 }
-//--------------------------------------------------
+//--------------connections working--------------------
 $connec = $map_decod["connections"];
 $count_conn=count($connec);
 for($cnnc_count=0;$cnnc_count<$count_conn;$cnnc_count++)
 {
-//soucre of cnnection
+//--------------soucre of cnnection--------------
 $sour= $connec[$cnnc_count]['source'];
     echo "source node:- ".$sour['nodeID']."<br>";
     echo "source conector:- ".$sour['connectorIndex']."<br>";
-//destination of connection
+//--------------destination of connection--------------
 $sour= $connec[$cnnc_count]['dest'];
     echo "destination node:- ".$sour['nodeID']."<br>";
     echo "destination conector:- ".$sour['connectorIndex']."<br>";    
