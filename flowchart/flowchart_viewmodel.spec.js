@@ -30,11 +30,11 @@ describe('flowchart-viewmodel', function () {
 				connectionDataModels.push({
 					source: {
 						nodeID: connections[i][0][0],
-						connectorIndex: connections[i][0][1],
+						inconnectorIndex: connections[i][0][1],
 					},
 					dest: {
 						nodeID: connections[i][1][0],
-						connectorIndex: connections[i][1][1],
+						outconnectorIndex: connections[i][1][1],
 					},
 				});
 			}

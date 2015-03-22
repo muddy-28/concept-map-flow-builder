@@ -1,3 +1,5 @@
+
+
 <?php
     echo "Yeah it is <br>";
     echo $_POST['json_obj'];
@@ -25,20 +27,38 @@ if ($conn->query($sql) === TRUE) {
     echo "<br>Error: " . $sql . "<br>" . $conn->error;
 }
 /*
-{ "nodes": [ { "name": "Adnan Shafique", "id": 10, "x": 282, "y": 684.0000267028809, "inputConnectors": [ { "name": "adasd" } ], "outputConnectors": [ { "name": "ashahsd" } ], "width": 250 }, { "name": "mad", "id": 11, "x": 267, "y": 71.99996566772461, "inputConnectors": [ { "name": "New connector" } ], "outputConnectors": [ { "name": "New connector" } ], "width": 250 } ], "connections": [ { "source": { "nodeID": 10, "connectorIndex": 0 }, "dest": { "nodeID": 11, "connectorIndex": 0 } }, { "source": { "nodeID": 11, "connectorIndex": 0 }, "dest": { "nodeID": 10, "connectorIndex": 0 } } ] }
+{ "nodes": [ { "name": "fgh", "id": 10, "x": 348, "y": 42, "inputConnectors": [ { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" } ], "outputConnectors": [], "width": 250 }, { "name": "New Node", "id": 11, "x": 33, "y": 280.99999618530273, "inputConnectors": [], "outputConnectors": [ { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" }, { "name": "New connector" } ], "width": 250 } ], "connections": [ { "source": { "nodeID": 11, "connectorIndex": 3 }, "dest": { "nodeID": 10, "connectorIndex": 2 } } ] }
 */
 
 $conn->close();
 $map_decod=json_decode($map,true);
-$data = array();
-$name = array();
-$id = array();
-                $nodes = $map_decod["nodes"];
 
-echo "NAME:-".$nodes[0]['name']."<br>";
-echo "ID:-".$nodes[0]['id']."<br>";
-$i_conn=$nodes[0]['inputConnectors'];
-echo "in connector 1-".$i_conn[0]['name']."<br>";
-$o_conn=$nodes[0]['outputConnectors'];
-echo "o_connector-1:-".$o_conn[0]['name']."<br>";
+$nodes = $map_decod["nodes"];
+$count_nodes=count($nodes);
+for($nodes_count=0;$nodes_count<$count_nodes;$nodes_count++)
+{
+echo "<br>NAME:-".$nodes[$nodes_count]['name']."<br>";
+echo "ID:-".$nodes[$nodes_count]['id']."<br>";
+
+//input connectors    
+$i_conn=$nodes[$nodes_count]['inputConnectors'];
+$count_i_conn=count($i_conn);
+//echo $count_i_conn;
+for($i_conn_count=0;$i_conn_count<$count_i_conn;$i_conn_count++)
+{
+    echo "in connector 1-".$i_conn[$i_conn_count]['name']."<br>";
+}
+//output connectors    
+$o_conn=$nodes[$nodes_count]['outputConnectors'];
+$count_o_conn=count($o_conn);
+//echo $count_o_conn;
+for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
+{
+    echo "out connector1-".$i_conn[$o_conn_count]['name']."<br><br>";
+}
+//--------------------------------------------------
+//$nodes = $map_decod["connections"];
+//$count_nodes=count($nodes);
+//echo "<br>NAME:-".$nodes[0]['source'][0]."<br>";
+}
 ?>
