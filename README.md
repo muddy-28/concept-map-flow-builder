@@ -1,7 +1,7 @@
-AngularJS-FlowChart
+Concept-map-Flow-Builder
 ===================
 
-A WebUI control for visualizing and editing flow charts.
+A WebUI control for visualizing and editing concept-maps.
 
 This isn't designed to be completely general purpose, but it will be a good basis if you need an SVG flowchart and you are willing to work with AngularJS.
 
