@@ -8,8 +8,8 @@
 <?php
 $servername = "localhost";
 $username = "root";
-$password = "mysql";
-$dbname = "concept-map-builder";
+$password = "root";
+$dbname = "concept_map";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -18,7 +18,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 } 
 
-$sql_map = "INSERT INTO `concept-map-builder`.`concept-maps` (`map_id`, `map_data`, `map_created_by`, `created_on`) VALUES (NULL,'$map', 'Adnan Shafique', CURRENT_TIMESTAMP)";
+$sql_map = "INSERT INTO `concept-maps` (`map_id`, `map_data`, `map_created_by`, `created_on`) VALUES (NULL,'$map', 'Adnan Shafique', CURRENT_TIMESTAMP)";
 
 if ($conn->query($sql_map) === TRUE) {
     $last_map = $conn->insert_id;
@@ -50,13 +50,11 @@ if ($conn->query($sql_node) === TRUE) {
 //--------------input connectors--------------    
 $i_conn=$nodes[$nodes_count]['inputConnectors'];
 $count_i_conn=count($i_conn);
-
 for($i_conn_count=0;$i_conn_count<$count_i_conn;$i_conn_count++)
 {
     echo "in connector".$i_conn_count.":_".$i_conn[$i_conn_count]['name']."<br>";
     $nme=$i_conn[$i_conn_count]['name'];
-    
-    $sql_node = "INSERT INTO 'input_connection'(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$i_conn_count,$nme)";
+    $sql_node = "INSERT INTO input_connection(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$i_conn_count,'$nme')";
 if ($conn->query($sql_node) === TRUE) {
     $last_inconnector = $conn->insert_id;
     echo "<h3>Input connector</h3> created successfully. Last inserted ID is: " . $last_inconnector;
@@ -73,7 +71,7 @@ for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
 {
     echo "out connector-".$o_conn_count.":_".$i_conn[$o_conn_count]['name']."<br>";
     $nme=$i_conn[$o_conn_count]['name'];
-    $sql_node = "INSERT INTO `output_connection`(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$o_conn_count,$nme)";
+    $sql_node = "INSERT INTO output_connection(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$o_conn_count,'$nme')";
 if ($conn->query($sql_node) === TRUE) {
     $last_outconnector = $conn->insert_id;
     echo "<h3>Output connector</h3> created successfully. Last inserted ID is: " . $last_outconnector;
