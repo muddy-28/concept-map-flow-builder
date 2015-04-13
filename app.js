@@ -119,7 +119,7 @@ angular.module('app', ['flowChart', ])
 	//
 	$scope.addNewNode = function () {
 
-		var nodeName = prompt("Enter a node name:", "New Node");
+		var nodeName = prompt("Enter a Node name:", "New Node");
 		if (!nodeName) {
 			return;
 		}
@@ -143,7 +143,7 @@ angular.module('app', ['flowChart', ])
 	// Add an input connector to selected nodes.
 	//
 	$scope.addNewInputConnector = function () {
-		var connectorName = prompt("Enter a connector name:", "New connector");
+		var connectorName = prompt("Enter a Input connector name:", "New connector");
 		if (!connectorName) {
 			return;
 		}
@@ -161,7 +161,7 @@ angular.module('app', ['flowChart', ])
 	// Add an output connector to selected nodes.
 	//
 	$scope.addNewOutputConnector = function () {
-		var connectorName = prompt("Enter a connector name:", "New connector");
+		var connectorName = prompt("Enter a Output connector name:", "New connector");
 		if (!connectorName) {
 			return;
 		}

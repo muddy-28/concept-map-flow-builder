@@ -2,14 +2,14 @@
 
 <?php
     echo "Yeah it is <br>";
-    echo $_POST['json_obj'];
+if(isset($_POST['json_obj']))
+{    echo $_POST['json_obj']."<br>";
     $map=$_POST['json_obj'];
-?>
-<?php
+
 $servername = "localhost";
 $username = "root";
-$password = "root";
-$dbname = "concept_map";
+$password = "mysql";
+$dbname = "conceptmap_builder";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -22,12 +22,11 @@ $sql_map = "INSERT INTO `concept-maps` (`map_id`, `map_data`, `map_created_by`, 
 
 if ($conn->query($sql_map) === TRUE) {
     $last_map = $conn->insert_id;
-    echo "<h3>Map</h3> created successfully. Last inserted map ID is: " . $last_map;
+    echo "<i>Map</i> created successfully. Last inserted map ID is: " . $last_map."<br>";
 } else {
     echo "Error: " . $sql_map . "<br>" . $conn->error;
 }
 
-//$conn->close();
 
 $map_decod=json_decode($map,true);
 
@@ -42,7 +41,7 @@ echo "ID:-".$nodes[$nodes_count]['id']."<br>";
 $sql_node = "INSERT INTO `nodes`(`map_id`, `node_id`, `nodeID`, `nodeName`) VALUES ($last_map,NULL,$id,'$name')";
 if ($conn->query($sql_node) === TRUE) {
     $last_id = $conn->insert_id;
-    echo "<h3>NODE</h3> created successfully. Last inserted ID is: " . $last_id;
+    echo "<i>NODE</i> created successfully. Last inserted ID is: " . $last_id."<br>";
 } else {
     echo "Error: " . $sql_node . "<br>" . $conn->error;
 }
@@ -57,7 +56,7 @@ for($i_conn_count=0;$i_conn_count<$count_i_conn;$i_conn_count++)
     $sql_node = "INSERT INTO input_connection(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$i_conn_count,'$nme')";
 if ($conn->query($sql_node) === TRUE) {
     $last_inconnector = $conn->insert_id;
-    echo "<h3>Input connector</h3> created successfully. Last inserted ID is: " . $last_inconnector;
+    echo "<i>Input connector</i> created successfully. Last inserted ID is: " . $last_inconnector."<br>";
 } else {
     echo "Error: " . $sql_node . "<br>" . $conn->error;
 }
@@ -74,7 +73,7 @@ for($o_conn_count=0;$o_conn_count<$count_o_conn;$o_conn_count++)
     $sql_node = "INSERT INTO output_connection(`node_id`, `connector_code`, `connector_name`) VALUES ($last_id,$o_conn_count,'$nme')";
 if ($conn->query($sql_node) === TRUE) {
     $last_outconnector = $conn->insert_id;
-    echo "<h3>Output connector</h3> created successfully. Last inserted ID is: " . $last_outconnector;
+    echo "<i>Output connector</i> created successfully. Last inserted ID is: " . $last_outconnector."<br>";
 } else {
     echo "Error: " . $sql_node . "<br>" . $conn->error;
 }
@@ -100,7 +99,7 @@ $sour= $connec[$cnnc_count]['source'];
 $sql_src = "INSERT INTO `src_node`(`node_id`, `connector_code`, `map_id`) VALUES ($node_src,$node_connectr_index,$last_map)";
 if ($conn->query($sql_src) === TRUE) {
     //$last_outconnector = $conn->insert_id;
-    echo "<h3>src connector</h3> created successfully.";
+    echo "<i>src connector</i> created successfully.<br>";
 } else {
     echo "Error: " . $sql_src . "<br>" . $conn->error;
 }
@@ -113,9 +112,13 @@ $sour= $connec[$cnnc_count]['dest'];
 $sql_dest = "INSERT INTO `dest_node`(`node_id`, `connector_code`, `map_id`) VALUES ($node_src,$node_connectr_index,$last_map)";
 if ($conn->query($sql_dest) === TRUE) {
     $last_outconnector = $conn->insert_id;
-    echo "<h3>Dest connector</h3> created successfully.";
+    echo "<i>Dest connector</i> created successfully.<br>";
 } else {
     echo "Error: " . $sql_dest . "<br>" . $conn->error;
 }  
 }
+$conn->close();
+}
+else
+    echo "create map n follow procedure...";
 ?>

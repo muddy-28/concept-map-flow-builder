@@ -16,7 +16,7 @@ Generic reset.
 }
 body {
 	width:auto
-	margin:45px auto;
+	margin:20px auto;
 	background-color:#D9D9D9;
     font-family: 'Ubuntu Mono';
     
@@ -121,7 +121,7 @@ The element (in this case the SVG element) that contains the draggable elements.
 */
 
 .draggable-container {
-	border: solid 1px blue;
+	border: solid 4px black;
 }
 
 /*
@@ -129,7 +129,7 @@ Drag selection rectangle.
 */
 
 .drag-selection-rect {
-	stroke: blue;
+	stroke: black;
 	stroke-width: 2;
 	fill: transparent;
 }
